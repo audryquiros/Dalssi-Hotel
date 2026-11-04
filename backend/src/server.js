@@ -1,5 +1,8 @@
 import dotenv from 'dotenv';
 import app from './app.js';
+import './models/index.js';
+import './models/index.js';
+import './models/index.js';
 import { testConnection } from './config/database.js';
 dotenv.config();
 const port = Number(process.env.PORT || 3000);

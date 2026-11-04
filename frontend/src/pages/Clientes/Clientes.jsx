@@ -1,3 +1,2 @@
-import { Users } from 'lucide-react'
-import './Clientes.css'
-export default function Clientes() { return <section className="empty-page"><span><Users size={25} /></span><h2>Clientes</h2><p>En esta sección construiremos la gestión correspondiente según el DER aprobado.</p></section> }
+import CrudPage from '../../components/CrudPage/CrudPage.jsx';
+export default function Clientes() { return <CrudPage table="clientes" title="Clientes" />; }

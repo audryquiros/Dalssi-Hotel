@@ -1,5 +1,11 @@
-import BaseModel from './BaseModel.js';
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
-// Modelo de acceso a datos para la entidad detalle_reservacion.
-const DetalleReservacionModel = new BaseModel('detalle_reservacion', 'id_detalle_reservacion');
+const DetalleReservacionModel = sequelize.define('detalle_reservacion', {
+  id_detalle_reservacion: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  id_reservacion: { type: DataTypes.INTEGER, allowNull: false },
+  id_habitacion: { type: DataTypes.INTEGER, allowNull: false },
+  precio_noche: { type: DataTypes.DECIMAL(10, 2) },
+}, { tableName: 'detalle_reservacion', timestamps: false });
+
 export default DetalleReservacionModel;

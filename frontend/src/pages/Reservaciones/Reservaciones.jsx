@@ -1,3 +1,2 @@
-import { CalendarDays } from 'lucide-react'
-import './Reservaciones.css'
-export default function Reservaciones() { return <section className="empty-page"><span><CalendarDays size={25} /></span><h2>Reservaciones</h2><p>En esta sección construiremos la gestión de reservaciones según el DER aprobado.</p></section> }
+import CrudPage from '../../components/CrudPage/CrudPage.jsx';
+export default function Reservaciones() { return <CrudPage table="reservaciones" title="Reservaciones" />; }

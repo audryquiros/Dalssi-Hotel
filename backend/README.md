@@ -1,41 +1,17 @@
-# Backend — Dalssi Hotel
+# Backend Dalssi Hotel
 
-API REST con Node.js, Express y MySQL. La estructura de tablas corresponde al DER aprobado (`mini proyecto (2).json`).
+Node.js + Express + Sequelize + MySQL, organizado con MVC.
 
-## Requisitos
-- Node.js 20 o superior
-- MySQL 8 o compatible
+## Instalación
+1. Copiar `.env.example` a `.env` y configurar credenciales MySQL.
+2. `npm install`
+3. `npm run db:create` (si la base aún no existe).
+4. Aplicar `database/schema.sql` para crear las 16 tablas según el DER.
+5. `npm run db:migrate` para registrar la línea base de migraciones.
+6. `npm run dev`
 
-## Configuración
-1. Copiar `.env.example` a `.env`.
-2. Completar `DB_HOST`, `DB_PORT`, `DB_USER` y `DB_PASSWORD`.
-3. Instalar dependencias: `npm install`.
-4. Crear la base de datos y sus tablas: `npm run db:create`.
-5. Iniciar API: `npm run dev`.
+## Migraciones
+Las migraciones están en `migrations/`. La primera es una línea base no destructiva que verifica las 16 tablas ya creadas. Las futuras modificaciones del esquema deben agregarse como nuevas migraciones. No usar `sync({ alter: true })`.
 
-El script SQL crea/verifica la base `dalssi_hotel` y las 16 tablas del DER. No inserta datos de prueba automáticamente.
-
-## Endpoints
-- `GET /api/health`
-- `GET /api/:tabla`
-- `GET /api/:tabla/:id`
-- `POST /api/:tabla`
-- `PUT /api/:tabla/:id`
-- `DELETE /api/:tabla/:id`
-
-Tablas permitidas: `personas`, `clientes`, `huespedes`, `empleados`, `paises`, `tipos_habitacion`, `habitaciones`, `reservaciones`, `detalle_reservacion`, `detalle_huespedes`, `categorias_servicios`, `servicios`, `reservacion_servicios`, `pagos`, `facturas`, `detalle_factura`.
-
-Los cuerpos POST/PUT usan nombres de columnas del DER. Las claves foráneas y restricciones de MySQL validan las relaciones. Esta primera versión ofrece CRUD base; reglas de negocio específicas (disponibilidad, cálculos de factura, transiciones de reservación) se implementarán cuando se definan.
-
-
-## Arquitectura MVC
-
-El backend está organizado siguiendo Modelo–Vista–Controlador (MVC):
-
-- `src/models/`: modelos de las 16 entidades; cada uno encapsula el acceso a su tabla mediante `BaseModel`.
-- `src/controllers/`: recibe las solicitudes, utiliza el modelo correspondiente y construye las respuestas HTTP.
-- `src/routes/`: declara los endpoints y los vincula con los controladores.
-- `src/config/`: configuración y conexión a MySQL.
-- `src/middleware/`: manejo centralizado de errores.
-
-La vista corresponde al frontend React, que consume la API del backend.
+## API
+`GET /api/health` y CRUD genérico `GET/POST/PUT/DELETE /api/:tabla`. Tablas admitidas: personas, clientes, paises, huespedes, empleados, tipos_habitacion, habitaciones, reservaciones, detalle_reservacion, detalle_huespedes, categorias_servicios, servicios, reservacion_servicios, pagos, facturas y detalle_factura.
