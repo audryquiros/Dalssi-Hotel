@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import * as controller from '../controllers/crud.controller.js';
+const router = Router();
+router.get('/health', (_req, res) => res.json({ status: 'ok', app: 'Dalssi Hotel API' }));
+router.get('/:table', controller.list);
+router.get('/:table/:id', controller.get);
+router.post('/:table', controller.create);
+router.put('/:table/:id', controller.update);
+router.delete('/:table/:id', controller.remove);
+export default router;
