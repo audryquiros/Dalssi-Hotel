@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Nunito Sans', sans-serif;
+  color: #252b45;
+  background: #f7f8fc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --dalssi-navy: #1e2a5a;
+  --dalssi-blue: #3e5ba6;
+  --dalssi-lavender: #8c7bc4;
+  --dalssi-sky: #b3c7e6;
+  --dalssi-pale: #ede9f8;
+  --dalssi-ink: #252b45;
+  --dalssi-muted: #7c8299;
+  --dalssi-border: #e9eaf2;
+  --dalssi-surface: #ffffff;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }

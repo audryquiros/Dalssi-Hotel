@@ -1,0 +1,12 @@
+.topbar { min-height: 91px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--dalssi-border); padding: 0 36px; background: rgba(255,255,255,.88); }
+.eyebrow { color: var(--dalssi-lavender); font-size: 9px; font-weight: 800; letter-spacing: 2px; }
+.topbar h1 { margin: 3px 0 0; color: var(--dalssi-navy); font: 600 25px 'Playfair Display', serif; }
+.topbar-actions { display: flex; align-items: center; gap: 13px; }
+.icon-button { width: 38px; height: 38px; border: 1px solid var(--dalssi-border); background: #fff; color: #777e96; border-radius: 11px; display: grid; place-items: center; position: relative; }
+.notification-button i { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #9a82d0; top: 8px; right: 9px; border: 1px solid #fff; }
+.profile { display: flex; align-items: center; gap: 9px; padding-left: 8px; }
+.profile-avatar { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: #eae7f6; color: var(--dalssi-navy); font-size: 11px; font-weight: 800; }
+.profile-copy strong, .profile-copy span { display: block; }
+.profile-copy strong { font-size: 11px; color: #353b55; }
+.profile-copy span { font-size: 10px; color: #9a9eb0; margin-top: 2px; }
+@media (max-width: 600px) { .topbar { padding: 0 16px; } .topbar-actions { gap: 7px; } .profile-copy, .profile > svg { display: none; } }
