@@ -12,7 +12,7 @@ export async function summary(req, res, next) {
       }),
       models.habitaciones.findAll({ attributes: ['id_habitacion', 'estado'] }),
       models.huespedes.count(),
-      models.pagos.findAll({ attributes: ['monto', 'fecha_pago'] }),
+      models.pagos.findAll({ attributes: ['monto', 'fecha_pago'], where: { estado: 'confirmado' } }),
     ]);
 
     const activeReservations = reservaciones.filter((r) => ['pendiente', 'confirmada', 'en_curso'].includes(r.estado)).length;

@@ -15,6 +15,7 @@ export const api = {
   get: (table, id) => request(`/${table}/${id}`),
   create: (table, data) => request(`/${table}`, { method: 'POST', body: JSON.stringify(data) }),
   update: (table, id, data) => request(`/${table}/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (path, data = undefined) => request(path, { method: 'PATCH', ...(data === undefined ? {} : { body: JSON.stringify(data) }) }),
   remove: (table, id) => request(`/${table}/${id}`, { method: 'DELETE' }),
   dashboard: () => request('/dashboard'),
   health: () => request('/health'),

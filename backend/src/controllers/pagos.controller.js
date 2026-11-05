@@ -21,7 +21,7 @@ export async function list(req, res, next) {
       try {
         const summary = await getReservationBillingSummary(row.id_reservacion);
         json.desglose = summary;
-        const invoice = await Factura.findOne({ where: { id_reservacion: row.id_reservacion } });
+        const invoice = await Factura.findOne({ where: { id_reservacion: row.id_reservacion, estado: 'emitida' } });
         json.facturable = false;
         json.factura_generada = Boolean(invoice);
       } catch (_) {
@@ -39,7 +39,7 @@ export async function get(req, res, next) {
     if (!data) return res.status(404).json({ message: 'Pago no encontrado.' });
     const json = data.toJSON();
     json.desglose = await getReservationBillingSummary(data.id_reservacion);
-    json.facturable = paymentHasConfirmed(data) && !(await Factura.findOne({ where: { id_reservacion: data.id_reservacion } }));
+    json.facturable = paymentHasConfirmed(data) && !(await Factura.findOne({ where: { id_reservacion: data.id_reservacion, estado: 'emitida' } }));
     res.json({ data: json });
   } catch (error) { next(error); }
 }
@@ -54,7 +54,7 @@ export async function availableReservations(req, res, next) {
       order: [['fecha_entrada', 'ASC'], ['id_reservacion', 'ASC']],
     });
     const data = reservations
-      .filter(row => row.estado !== 'cancelada' && row.cliente?.estado !== 'inactivo' && row.cliente?.persona?.estado !== 'inactivo' && !(row.pagos || []).length)
+      .filter(row => row.estado !== 'cancelada' && row.cliente?.estado !== 'inactivo' && row.cliente?.persona?.estado !== 'inactivo' && !(row.pagos || []).some(payment => ['pendiente', 'confirmado'].includes(payment.estado)))
       .map(row => ({
         id_reservacion: row.id_reservacion,
         fecha_entrada: row.fecha_entrada,
@@ -80,8 +80,12 @@ export async function create(req, res, next) {
     if (!id_reservacion) throw Object.assign(new Error('Debe seleccionar una reservación.'), { status: 400 });
     const reservation = await Reservacion.findByPk(id_reservacion, { transaction });
     if (!reservation) throw Object.assign(new Error('La reservación indicada no existe.'), { status: 400 });
-    const existing = await Pago.findOne({ where: { id_reservacion }, transaction, lock: transaction.LOCK.UPDATE });
-    if (existing) throw Object.assign(new Error('Esta reservación ya tiene un pago asociado.'), { status: 409 });
+    const existing = await Pago.findOne({
+      where: { id_reservacion, estado: ['pendiente', 'confirmado'] },
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+    if (existing) throw Object.assign(new Error('Esta reservación ya tiene un pago activo asociado.'), { status: 409 });
     if (reservation.estado === 'cancelada') throw Object.assign(new Error('No se puede registrar un pago para una reservación cancelada.'), { status: 400 });
 
     const summary = await getReservationBillingSummary(id_reservacion, transaction);
@@ -120,24 +124,51 @@ export async function update(req, res, next) {
   try {
     const payment = await Pago.findByPk(req.params.id, { transaction });
     if (!payment) throw Object.assign(new Error('Pago no encontrado.'), { status: 404 });
+
+    const previousState = payment.estado;
+    const nextState = req.body.estado ?? previousState;
     const nextReservation = req.body.id_reservacion ?? payment.id_reservacion;
+
     if (Number(nextReservation) !== Number(payment.id_reservacion)) {
-      const other = await Pago.findOne({ where: { id_reservacion: nextReservation }, transaction });
-      if (other) throw Object.assign(new Error('La reservación seleccionada ya tiene un pago asociado.'), { status: 409 });
+      const other = await Pago.findOne({
+        where: { id_reservacion: nextReservation, estado: ['pendiente', 'confirmado'] },
+        transaction,
+      });
+      if (other) throw Object.assign(new Error('La reservación seleccionada ya tiene un pago activo asociado.'), { status: 409 });
     }
+
     const summary = await getReservationBillingSummary(nextReservation, transaction);
     const nextAmount = req.body.monto == null || req.body.monto === '' ? summary.total : Number(req.body.monto);
-    if (Math.abs(nextAmount - summary.total) > 0.01) return res.status(400).json({ message: `El monto debe coincidir con el total de la reservación: ₡${summary.total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}.` });
-    await payment.update({ ...req.body, monto: summary.total }, { transaction });
+    if (Math.abs(nextAmount - summary.total) > 0.01) {
+      throw Object.assign(new Error(`El monto debe coincidir con el total de la reservación: ₡${summary.total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}.`), { status: 400 });
+    }
+
+    await payment.update({ ...req.body, id_reservacion: nextReservation, monto: summary.total }, { transaction });
+
+    // Si el pago deja de estar confirmado, la factura emitida asociada deja de ser válida.
+    // Se conserva como historial y podrá generarse otra al confirmar un nuevo pago.
+    if (previousState === 'confirmado' && nextState !== 'confirmado') {
+      await Factura.update(
+        { estado: 'anulada' },
+        { where: { id_reservacion: payment.id_reservacion, estado: 'emitida' }, transaction }
+      );
+    }
+
     let invoice = null;
-    if (paymentHasConfirmed(payment)) invoice = await createInvoiceForReservation(payment.id_reservacion, transaction);
+    if (nextState === 'confirmado') {
+      invoice = await createInvoiceForReservation(nextReservation, transaction);
+    }
+
     await transaction.commit();
     const data = await Pago.findByPk(payment.id_pago, { include: [reservationInclude] });
     const json = data.toJSON();
     json.desglose = await getReservationBillingSummary(payment.id_reservacion);
     json.facturable = false;
     json.factura_generada = Boolean(invoice);
-    res.json({ message: invoice ? 'Pago actualizado correctamente. Factura generada automáticamente.' : 'Pago actualizado correctamente.', data: json });
+    res.json({
+      message: invoice ? 'Pago actualizado correctamente. Factura generada automáticamente.' : 'Pago actualizado correctamente.',
+      data: json,
+    });
   } catch (error) {
     await transaction.rollback();
     next(error);

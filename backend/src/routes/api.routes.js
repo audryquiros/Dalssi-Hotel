@@ -35,6 +35,7 @@ router.get('/facturas', facturasController.list);
 router.get('/facturas/:id', facturasController.get);
 router.post('/facturas', facturasController.create);
 router.put('/facturas/:id', facturasController.update);
+router.patch('/facturas/:id/anular', facturasController.cancel);
 router.delete('/facturas/:id', facturasController.remove);
 
 router.get('/empleados', empleadosController.list);

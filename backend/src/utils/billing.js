@@ -90,9 +90,6 @@ export async function getReservationBillingSummary(id_reservacion, transaction) 
 
 
 export async function createInvoiceForReservation(id_reservacion, transaction) {
-  // Una reservación solo puede tener una factura. Si existe una factura anulada
-  // creada previamente para esta reservación, se reactiva al confirmar el pago
-  // en lugar de intentar insertar otra y provocar ER_DUP_ENTRY.
   // Solo una factura EMITIDA puede bloquear la generación de otra.
   // Las anuladas se conservan como historial y permiten generar una nueva.
   const existing = await Factura.findOne({

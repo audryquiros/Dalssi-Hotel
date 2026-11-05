@@ -189,6 +189,29 @@ export async function update(req, res, next) {
   }
 }
 
+export async function cancel(req, res, next) {
+  const transaction = await sequelize.transaction();
+  try {
+    const invoice = await Factura.findByPk(req.params.id, { transaction });
+    if (!invoice) throw Object.assign(new Error('Factura no encontrada.'), { status: 404 });
+    if (invoice.estado === 'anulada') throw Object.assign(new Error('La factura ya está anulada.'), { status: 409 });
+
+    await invoice.update({ estado: 'anulada' }, { transaction });
+
+    await transaction.commit();
+    const data = await Factura.findByPk(invoice.id_factura, {
+      include: [
+        { model: Reservacion, as: 'reservacion', include: reservationInclude },
+        { model: DetalleFactura, as: 'detalle_factura' },
+      ],
+    });
+    res.json({ message: 'Factura anulada correctamente.', data: withDerivedRate(data) });
+  } catch (error) {
+    await transaction.rollback();
+    next(error);
+  }
+}
+
 export async function remove(req, res, next) {
   return res.status(409).json({ message: 'Las facturas no se eliminan. Se conservan para impresión y control de facturación.' });
 }
