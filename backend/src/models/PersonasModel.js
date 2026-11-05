@@ -8,7 +8,6 @@ const PersonasModel = sequelize.define('personas', {
   apellidos: { type: DataTypes.STRING(60) },
   telefono: { type: DataTypes.STRING(30) },
   correo: { type: DataTypes.STRING(100) },
-  estado: { type: DataTypes.ENUM('activo', 'inactivo'), allowNull: false, defaultValue: 'activo' },
 }, { tableName: 'personas', timestamps: false });
 
 export default PersonasModel;

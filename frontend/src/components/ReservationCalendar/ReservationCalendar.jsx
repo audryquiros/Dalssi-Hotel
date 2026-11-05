@@ -49,11 +49,9 @@ const overlaps = (day, reservation) => {
   return key >= dateKey(start) && key <= dateKey(end);
 };
 
-export default function ReservationCalendar({ reservations = [], onClose, onSelect, onMove }) {
+export default function ReservationCalendar({ reservations = [], onClose, onSelect }) {
   const today = new Date();
   const [month, setMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const [dragging, setDragging] = useState(null);
-  const [dropTarget, setDropTarget] = useState(null);
   const days = useMemo(() => getDays(month), [month]);
 
   const reservationsByDay = useMemo(() => {
@@ -97,59 +95,18 @@ export default function ReservationCalendar({ reservations = [], onClose, onSele
             const outside = day.getMonth() !== month.getMonth();
             const isToday = dateKey(day) === dateKey(today);
             return (
-              <div
-                className={`reservation-calendar-day ${outside ? 'outside' : ''} ${isToday ? 'today' : ''} ${dropTarget === dateKey(day) ? 'drop-target' : ''}`}
-                key={dateKey(day)}
-                onDragOver={event => { event.preventDefault(); setDropTarget(dateKey(day)); }}
-                onDragLeave={() => setDropTarget(current => current === dateKey(day) ? null : current)}
-                onDrop={event => {
-                  event.preventDefault();
-                  const payload = event.dataTransfer.getData('application/dalssi-reservation');
-                  setDropTarget(null);
-                  if (!payload) return;
-                  try {
-                    const data = JSON.parse(payload);
-                    onMove?.(Number(data.id_reservacion), data.mode, data.sourceDate, dateKey(day), data.startDate, data.endDate);
-                  } catch (_) {}
-                }}
-              >
+              <div className={`reservation-calendar-day ${outside ? 'outside' : ''} ${isToday ? 'today' : ''}`} key={dateKey(day)}>
                 <span className="calendar-day-number">{day.getDate()}</span>
                 <div className="calendar-events">
                   {items.slice(0, 3).map(reservation => {
                     const status = reservation.estado || 'pendiente';
-                    const start = dateKey(parseDate(reservation.fecha_entrada));
-                    const end = dateKey(parseDate(reservation.fecha_salida) || parseDate(reservation.fecha_entrada));
-                    const current = dateKey(day);
-                    const isFirst = current === start;
-                    const isLast = current === end;
-                    const dragMode = isFirst ? 'move' : (isLast ? 'resize-end' : null);
-                    const canDrag = Boolean(dragMode);
-                    const title = isFirst
-                      ? `Reservación #${reservation.id_reservacion} · Arrastrá este primer día para mover toda la reservación`
-                      : isLast
-                        ? `Reservación #${reservation.id_reservacion} · Arrastrá este último día para alargar o acortar la estadía`
-                        : `Reservación #${reservation.id_reservacion} · Este día no se puede mover`;
                     return (
                       <button
                         type="button"
-                        className={`calendar-event ${STATUS_CLASS[status] || 'pending'} ${isFirst ? 'calendar-event-start' : ''} ${isLast ? 'calendar-event-end' : ''} ${!canDrag ? 'calendar-event-middle' : ''} ${dragging === reservation.id_reservacion ? 'dragging' : ''}`}
+                        className={`calendar-event ${STATUS_CLASS[status] || 'pending'}`}
                         key={`${dateKey(day)}-${reservation.id_reservacion}`}
-                        title={title}
-                        draggable={canDrag}
-                        onDragStart={event => {
-                          if (!canDrag) { event.preventDefault(); return; }
-                          event.dataTransfer.effectAllowed = 'move';
-                          event.dataTransfer.setData('application/dalssi-reservation', JSON.stringify({
-                            id_reservacion: reservation.id_reservacion,
-                            sourceDate: current,
-                            startDate: start,
-                            endDate: end,
-                            mode: dragMode,
-                          }));
-                          setDragging(reservation.id_reservacion);
-                        }}
-                        onDragEnd={() => { setDragging(null); setDropTarget(null); }}
                         onClick={() => onSelect?.(reservation)}
+                        title={`Reservación #${reservation.id_reservacion} · ${enumLabel(status)}`}
                       >
                         <span>#{reservation.id_reservacion}</span>
                         <small>{enumLabel(status)}</small>
@@ -171,7 +128,7 @@ export default function ReservationCalendar({ reservations = [], onClose, onSele
 
         <div className="reservation-calendar-details">
           <strong>{reservations.length} reservaciones registradas</strong>
-          <span>Arrastrá el primer día para mover la reservación. Arrastrá el último para alargar o acortar la estadía. Los días intermedios no se pueden mover.</span>
+          <span>Seleccioná una reservación para consultar su detalle.</span>
         </div>
       </section>
     </div>,

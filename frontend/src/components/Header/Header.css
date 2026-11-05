@@ -1,7 +1,6 @@
 .topbar { min-height: 91px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--dalssi-border); padding: 0 36px; background: rgba(255,255,255,.92); position: relative; z-index: 20; }
 .eyebrow { color: var(--dalssi-lavender); font-size: 9px; font-weight: 800; letter-spacing: 2px; }
 .topbar h1 { margin: 3px 0 0; color: var(--dalssi-navy); font: 600 25px 'Playfair Display', serif; }
-.topbar-description { margin: 2px 0 0; color: #8490a5; font-size: 12px; line-height: 1.4; }
 .topbar-actions { display: flex; align-items: center; gap: 13px; }
 .icon-button { width: 40px; height: 40px; border: 1px solid var(--dalssi-border); background: #fff; color: #777e96; border-radius: 11px; display: grid; place-items: center; position: relative; cursor: pointer; transition: .2s ease; }
 .icon-button:hover { color: var(--dalssi-navy); border-color: #b9b1d9; background: #f8f7fc; }

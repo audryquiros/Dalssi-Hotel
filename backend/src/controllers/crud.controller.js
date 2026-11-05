@@ -19,7 +19,6 @@ export async function list(req,res,next){
       const data = await model.findAll({
         include: [{
           model: models.clientes,
-          as: 'cliente',
           include: [{ model: models.personas, as: 'persona' }],
         }],
       });
@@ -41,7 +40,6 @@ export async function get(req,res,next){
       const data = await model.findByPk(req.params.id, {
         include: [{
           model: models.clientes,
-          as: 'cliente',
           include: [{ model: models.personas, as: 'persona' }],
         }],
       });

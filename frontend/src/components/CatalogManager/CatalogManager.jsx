@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2, X, Save } from 'lucide-react';
 import { api } from '../../services/api.js';
 import './CatalogManager.css';
-import { useConfirm } from '../ConfirmDialog/ConfirmDialog.jsx';
 
 export default function CatalogManager({ table, title, fields = [{ key: 'nombre', label: 'Nombre', required: true }], onClose, onChanged }) {
-  const confirm = useConfirm();
   const [rows,setRows]=useState([]),[form,setForm]=useState({}),[editing,setEditing]=useState(null),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState('');
 
   const load=async()=>{setLoading(true);try{const result=await api.list(table);setRows(result.data||[]);}catch(e){setError(e.message);}finally{setLoading(false);}};
@@ -13,7 +11,7 @@ export default function CatalogManager({ table, title, fields = [{ key: 'nombre'
   const openNew=()=>{setForm(Object.fromEntries(fields.map(f=>[f.key,''])));setEditing('new');setError('');};
   const openEdit=(row)=>{setForm(Object.fromEntries(fields.map(f=>[f.key,row[f.key]??''])));setEditing(row[Object.keys(row).find(k=>k.startsWith('id_'))]);setError('');};
   const save=async(e)=>{e.preventDefault();setSaving(true);setError('');try{if(editing==='new')await api.create(table,form);else await api.update(table,editing,form);setEditing(null);await load();onChanged?.();}catch(e){setError(e.message);}finally{setSaving(false);}};
-  const remove=async(row)=>{const id=Object.keys(row).find(k=>k.startsWith('id_'));if(!id||!(await confirm(`¿Eliminar ${title.toLowerCase().replace(/^gestión de /,'')}? Esta acción no se puede deshacer.`)))return;try{await api.remove(table,row[id]);await load();onChanged?.();}catch(e){setError(e.message);}};
+  const remove=async(row)=>{const id=Object.keys(row).find(k=>k.startsWith('id_'));if(!id||!confirm(`¿Eliminar ${title.toLowerCase().replace(/^gestión de /,'')}?`))return;try{await api.remove(table,row[id]);await load();onChanged?.();}catch(e){setError(e.message);}};
   return <div className="catalog-backdrop" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}>
     <div className="catalog-modal">
       <div className="catalog-head"><div><span>CATÁLOGO</span><h3>Gestionar {title}</h3></div><button onClick={onClose}><X size={19}/></button></div>

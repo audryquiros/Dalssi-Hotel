@@ -6,8 +6,8 @@ export async function summary(req, res, next) {
       models.reservaciones.findAll({
         attributes: ['id_reservacion', 'id_cliente', 'estado', 'fecha_entrada', 'fecha_salida'],
         include: [
-          { model: models.clientes, as: 'cliente', include: [{ model: models.personas, as: 'persona' }] },
-          { model: models.detalle_reservacion, as: 'detalle_reservacion', include: [{ model: models.habitaciones, as: 'habitacion' }] },
+          { model: models.clientes, include: [{ model: models.personas, as: 'persona' }] },
+          { model: models.detalle_reservacion, as: 'detalle_reservacion', include: [{ model: models.habitaciones }] },
         ],
       }),
       models.habitaciones.findAll({ attributes: ['id_habitacion', 'estado'] }),

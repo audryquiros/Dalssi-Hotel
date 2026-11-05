@@ -1,7 +1,7 @@
 import { X, Printer } from 'lucide-react';
 import './DetailModal.css';
 
-export default function DetailModal({ title, items = [], onClose, onPrint, printLabel = 'Imprimir', children }) {
+export default function DetailModal({ title, items = [], onClose, onPrint, printLabel = 'Imprimir' }) {
   return (
     <div className="detail-modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div className="detail-modal">
@@ -20,7 +20,6 @@ export default function DetailModal({ title, items = [], onClose, onPrint, print
             </div>
           ))}
         </div>
-        {children}
       </div>
     </div>
   );

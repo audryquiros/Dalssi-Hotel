@@ -29,9 +29,3 @@
 .reservation-calendar-footer span{display:flex;align-items:center;gap:5px}.legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block}.legend-dot.pending{background:#d69b43}.legend-dot.confirmed{background:#55a37f}.legend-dot.active{background:#6c8bc8}.legend-dot.finished{background:#8e96a7}.legend-dot.cancelled{background:#bb727c}
 .reservation-calendar-details{display:flex;justify-content:space-between;gap:15px;margin-top:12px;color:#9a9faf;font-size:10px}.reservation-calendar-details strong{color:#626a80}
 @media(max-width:760px){.reservation-calendar-backdrop{padding:10px}.reservation-calendar-modal{padding:16px;border-radius:16px}.reservation-calendar-header h2{font-size:21px}.reservation-calendar-grid{min-width:700px}.reservation-calendar-weekdays{min-width:700px}.reservation-calendar-modal{overflow:auto}.reservation-calendar-day{min-height:95px}.reservation-calendar-details{flex-direction:column}}
-
-.reservation-calendar-day.drop-target{background:#f2f0fb;box-shadow:inset 0 0 0 2px rgba(111,99,169,.25)}
-.calendar-event[draggable='true']{cursor:grab}
-.calendar-event.dragging{opacity:.45;cursor:grabbing}
-
-.calendar-event-start{cursor:grab}.calendar-event-end{cursor:ew-resize}.calendar-event-middle{cursor:default}.calendar-event-start:active{cursor:grabbing}.calendar-event-end:active{cursor:ew-resize}.calendar-event-middle:hover{filter:none}
