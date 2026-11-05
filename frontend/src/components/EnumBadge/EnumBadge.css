@@ -1,0 +1,10 @@
+.enum-badge{display:inline-flex;align-items:center;min-height:25px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;line-height:1;white-space:nowrap}
+.enum-activo,.enum-disponible,.enum-confirmada,.enum-confirmado,.enum-emitida{background:#e9f5ef;color:#32735a}
+.enum-inactivo,.enum-finalizada{background:#eef0f4;color:#687185}
+.enum-ocupada,.enum-en-curso{background:#e9effb;color:#46659d}
+.enum-mantenimiento,.enum-pendiente{background:#fff3df;color:#996b2d}
+.enum-limpieza,.enum-sinpe{background:#e9f4f8;color:#3e7080}
+.enum-cancelada,.enum-rechazado,.enum-anulado{background:#f8e9ec;color:#9b5964}
+.enum-transferencia{background:#ede9f8;color:#5d4f8d}
+.enum-tarjeta{background:#e9edf9;color:#4c5f98}
+.enum-efectivo{background:#edf4e8;color:#56734a}

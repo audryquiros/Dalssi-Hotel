@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Plus, Search, Pencil, Trash2, RefreshCw, X, Save } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, RefreshCw, X, Save, Eye } from 'lucide-react';
 import { api } from '../../services/api.js';
+import Select from '../../components/Select/Select.jsx';
+import DatePicker from '../../components/DatePicker/DatePicker.jsx';
+import DetailModal from '../../components/DetailModal/DetailModal.jsx';
+import EnumBadge from '../../components/EnumBadge/EnumBadge.jsx';
+import CatalogManager from '../../components/CatalogManager/CatalogManager.jsx';
 import './Empleados.css';
+
+const dateText = (value) => { if (!value) return '—'; const date = new Date(value); return Number.isNaN(date.getTime()) ? String(value).slice(0, 10) : date.toLocaleDateString('es-CR'); };
 
 const emptyForm = {
   identificacion: '',
@@ -23,6 +30,8 @@ export default function Empleados() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [viewing, setViewing] = useState(null);
+  const [managePuestos, setManagePuestos] = useState(false);
 
   const loadPuestos = async () => {
     try {
@@ -122,10 +131,7 @@ export default function Empleados() {
   return (
     <section className="crud-page">
       <div className="crud-heading">
-        <div>
-          <h2>Empleados</h2>
-          <p>Personal del hotel y sus datos personales.</p>
-        </div>
+        <div><p className="crud-description">Personal del hotel y sus datos personales.</p></div>
         <button className="crud-primary" onClick={openNew}><Plus size={17} /> Nuevo empleado</button>
       </div>
 
@@ -167,10 +173,11 @@ export default function Empleados() {
                     <td>{persona.telefono || '—'}</td>
                     <td>{persona.correo || '—'}</td>
                     <td>{row.puesto?.nombre || '—'}</td>
-                    <td>{row.fecha_contratacion ? String(row.fecha_contratacion).slice(0, 10) : '—'}</td>
-                    <td>{row.estado || '—'}</td>
+                    <td>{dateText(row.fecha_contratacion)}</td>
+                    <td><EnumBadge value={row.estado} /></td>
                     <td>
                       <div className="crud-actions">
+                        <button onClick={() => setViewing(row)} title="Ver detalle"><Eye size={16} /></button>
                         <button onClick={() => openEdit(row)} title="Editar"><Pencil size={16} /></button>
                         <button onClick={() => remove(row)} title="Eliminar"><Trash2 size={16} /></button>
                       </div>
@@ -182,6 +189,24 @@ export default function Empleados() {
           </table>
         )}
       </div>
+
+      {managePuestos && <CatalogManager table="puesto" title="puestos" onClose={() => setManagePuestos(false)} onChanged={loadPuestos} />}
+
+      {viewing && (
+        <DetailModal
+          title={`${viewing.persona?.nombre || ''} ${viewing.persona?.apellidos || ''}`.trim() || 'Empleado'}
+          items={[
+            { label: 'Identificación', value: viewing.persona?.identificacion },
+            { label: 'Teléfono', value: viewing.persona?.telefono },
+            { label: 'Correo', value: viewing.persona?.correo },
+            { label: 'Puesto', value: viewing.puesto?.nombre },
+            { label: 'Contratación', value: viewing.fecha_contratacion ? String(viewing.fecha_contratacion).slice(0, 10) : '—' },
+            { label: 'Estado', value: viewing.estado },
+            { label: 'ID empleado', value: viewing.id_empleado },
+          ]}
+          onClose={() => setViewing(null)}
+        />
+      )}
 
       {editing !== null && (
         <div className="crud-modal-backdrop">
@@ -197,9 +222,9 @@ export default function Empleados() {
               <label>Apellidos<input required value={form.apellidos} onChange={(e) => setForm({ ...form, apellidos: e.target.value })} /></label>
               <label>Teléfono<input value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} /></label>
               <label>Correo<input type="email" value={form.correo} onChange={(e) => setForm({ ...form, correo: e.target.value })} /></label>
-              <label>Puesto<select required value={form.id_puesto} onChange={(e) => setForm({ ...form, id_puesto: e.target.value })}><option value="">Seleccione un puesto</option>{puestos.map((puesto) => <option key={puesto.id_puesto} value={puesto.id_puesto}>{puesto.nombre}</option>)}</select></label>
-              <label>Fecha de contratación<input type="date" value={form.fecha_contratacion} onChange={(e) => setForm({ ...form, fecha_contratacion: e.target.value })} /></label>
-              <label>Estado<select value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })}><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></label>
+              <label>Puesto<div className="select-with-action"><Select value={form.id_puesto} onChange={(e) => setForm({ ...form, id_puesto: e.target.value })} placeholder="Seleccione un puesto" options={puestos.map((puesto) => ({ value: puesto.id_puesto, label: puesto.nombre }))} /><button type="button" className="catalog-link" onClick={() => setManagePuestos(true)}>Gestionar</button></div></label>
+              <label>Fecha de contratación<DatePicker value={form.fecha_contratacion} onChange={(e) => setForm({ ...form, fecha_contratacion: e.target.value })} /></label>
+              <label>Estado<Select value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })} placeholder="Seleccione un estado" options={[{ value: 'activo', label: 'Activo' }, { value: 'inactivo', label: 'Inactivo' }]} /></label>
             </div>
 
             <div className="crud-modal-actions">

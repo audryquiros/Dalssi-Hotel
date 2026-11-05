@@ -36,15 +36,15 @@ export const models = {
 };
 
 PersonasModel.hasMany(ClientesModel, { foreignKey: 'id_persona', as: 'clientes' });
-ClientesModel.belongsTo(PersonasModel, { foreignKey: 'id_persona' });
+ClientesModel.belongsTo(PersonasModel, { foreignKey: 'id_persona', as: 'persona' });
 PersonasModel.hasMany(HuespedesModel, { foreignKey: 'id_persona', as: 'huespedes' });
-HuespedesModel.belongsTo(PersonasModel, { foreignKey: 'id_persona' });
+HuespedesModel.belongsTo(PersonasModel, { foreignKey: 'id_persona', as: 'persona' });
 PersonasModel.hasOne(EmpleadosModel, { foreignKey: 'id_persona', as: 'empleado' });
 EmpleadosModel.belongsTo(PersonasModel, { foreignKey: 'id_persona', as: 'persona' });
 PuestoModel.hasMany(EmpleadosModel, { foreignKey: 'id_puesto', as: 'empleados' });
 EmpleadosModel.belongsTo(PuestoModel, { foreignKey: 'id_puesto', as: 'puesto' });
 PaisesModel.hasMany(HuespedesModel, { foreignKey: 'id_pais', as: 'huespedes' });
-HuespedesModel.belongsTo(PaisesModel, { foreignKey: 'id_pais' });
+HuespedesModel.belongsTo(PaisesModel, { foreignKey: 'id_pais', as: 'pais' });
 TiposHabitacionModel.hasMany(HabitacionesModel, { foreignKey: 'id_tipo_habitacion', as: 'habitaciones' });
 HabitacionesModel.belongsTo(TiposHabitacionModel, { foreignKey: 'id_tipo_habitacion' });
 ClientesModel.hasMany(ReservacionesModel, { foreignKey: 'id_cliente', as: 'reservaciones' });
