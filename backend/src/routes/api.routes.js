@@ -4,7 +4,6 @@ import * as empleadosController from '../controllers/empleados.controller.js';
 import * as clientesController from '../controllers/clientes.controller.js';
 import * as huespedesController from '../controllers/huespedes.controller.js';
 import * as dashboardController from '../controllers/dashboard.controller.js';
-import * as facturasController from '../controllers/facturas.controller.js';
 
 const router = Router();
 
@@ -29,13 +28,6 @@ router.post('/huespedes', huespedesController.create);
 router.put('/huespedes/:id', huespedesController.update);
 router.delete('/huespedes/:id', huespedesController.remove);
 router.get('/huespedes-paises', huespedesController.paises);
-
-router.get('/facturas', facturasController.list);
-router.get('/facturas/:id', facturasController.get);
-router.post('/facturas/calcular', facturasController.calculate);
-router.post('/facturas', facturasController.create);
-router.put('/facturas/:id', facturasController.update);
-router.delete('/facturas/:id', facturasController.remove);
 
 router.get('/:table', controller.list);
 router.get('/:table/:id', controller.get);

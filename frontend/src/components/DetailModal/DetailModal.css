@@ -3,8 +3,8 @@
 .detail-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px}
 .detail-kicker{display:block;color:var(--dalssi-lavender);font-size:8px;font-weight:900;letter-spacing:1.8px;margin-bottom:5px}
 .detail-modal-head h3{margin:0;color:var(--dalssi-navy);font:600 21px 'Playfair Display',serif}
-.detail-modal-head button{width:34px;height:34px;border:1px solid #e8e7ef;border-radius:10px;background:#fff;color:#7d8499;display:grid;place-items:center;cursor:pointer}
-.detail-modal-head button:hover{color:var(--dalssi-navy);background:#f7f6fb}
+.detail-modal-head-actions{display:flex;align-items:center;gap:8px}.detail-modal-head-actions button{width:34px;height:34px;border:1px solid #e8e7ef;border-radius:10px;background:#fff;color:#7d8499;display:grid;place-items:center;cursor:pointer}
+.detail-modal-head-actions button:hover{color:var(--dalssi-navy);background:#f7f6fb}
 .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .detail-item{padding:12px 13px;border:1px solid #eeeef4;border-radius:11px;background:#fafafd}
 .detail-item span{display:block;color:#969bad;font-size:9px;margin-bottom:5px}

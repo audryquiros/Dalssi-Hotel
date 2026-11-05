@@ -8,8 +8,6 @@ import EnumBadge from '../../components/EnumBadge/EnumBadge.jsx';
 import CatalogManager from '../../components/CatalogManager/CatalogManager.jsx';
 import './Empleados.css';
 
-const dateText = (value) => { if (!value) return '—'; const date = new Date(value); return Number.isNaN(date.getTime()) ? String(value).slice(0, 10) : date.toLocaleDateString('es-CR'); };
-
 const emptyForm = {
   identificacion: '',
   nombre: '',
@@ -130,12 +128,16 @@ export default function Empleados() {
 
   return (
     <section className="crud-page">
-<div className="crud-toolbar">
+      <div className="crud-heading">
+        <div><p className="crud-description">Personal del hotel y sus datos personales.</p></div>
+        <button className="crud-primary" onClick={openNew}><Plus size={17} /> Nuevo empleado</button>
+      </div>
+
+      <div className="crud-toolbar">
         <div className="crud-search">
           <Search size={17} />
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar empleados..." />
         </div>
-        <button className="crud-primary crud-toolbar-primary" onClick={openNew}><Plus size={17} /> Nuevo empleado</button>
         <button className="crud-icon-btn" onClick={load} title="Actualizar"><RefreshCw size={17} /></button>
         <span>{filtered.length} registros</span>
       </div>
@@ -169,8 +171,8 @@ export default function Empleados() {
                     <td>{persona.telefono || '—'}</td>
                     <td>{persona.correo || '—'}</td>
                     <td>{row.puesto?.nombre || '—'}</td>
-                    <td>{dateText(row.fecha_contratacion)}</td>
-                    <td><EnumBadge value={row.estado} /></td>
+                    <td>{row.fecha_contratacion ? String(row.fecha_contratacion).slice(0, 10) : '—'}</td>
+                    <td><EnumBadge field="estado" value={row.estado} /></td>
                     <td>
                       <div className="crud-actions">
                         <button onClick={() => setViewing(row)} title="Ver detalle"><Eye size={16} /></button>
@@ -197,7 +199,7 @@ export default function Empleados() {
             { label: 'Correo', value: viewing.persona?.correo },
             { label: 'Puesto', value: viewing.puesto?.nombre },
             { label: 'Contratación', value: viewing.fecha_contratacion ? String(viewing.fecha_contratacion).slice(0, 10) : '—' },
-            { label: 'Estado', value: viewing.estado },
+            { label: 'Estado', value: <EnumBadge field="estado" value={viewing.estado} /> },
             { label: 'ID empleado', value: viewing.id_empleado },
           ]}
           onClose={() => setViewing(null)}

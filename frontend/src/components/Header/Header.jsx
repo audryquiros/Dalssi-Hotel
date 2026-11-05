@@ -20,7 +20,7 @@ const initialNotifications = [
   { id: 2, title: 'Recordatorio', message: 'Revisa las reservaciones próximas desde el menú.', time: 'Hoy', read: false },
 ]
 
-export default function Header({ title, subtitle }) {
+export default function Header({ title }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -43,7 +43,6 @@ export default function Header({ title, subtitle }) {
       <div className="topbar-heading">
         <span className="eyebrow">DALSSI HOTEL</span>
         <h1>{title}</h1>
-        {subtitle && <p className="topbar-subtitle">{subtitle}</p>}
       </div>
 
       <div className="topbar-actions">

@@ -60,48 +60,17 @@ No modificar el DER ni agregar entidades o relaciones sin indicación del usuari
 - Consultar antes de tomar decisiones que afecten arquitectura, DER o alcance.
 - Mantener el diseño visual coherente con el branding de Dalssi.
 
-
 ## 8. Estructura visual estándar definitiva
-Todas las páginas principales de Dalssi deben seguir esta jerarquía visual:
-
-### Header
-- Mostrar `DALSSI HOTEL`.
-- Debajo mostrar el nombre de la sección en `Playfair Display`.
-- Debajo del nombre mostrar un subtítulo/descripcion breve en `Nunito Sans`.
-- El nombre y subtítulo son responsabilidad del Header/Layout, no del contenido de la página.
-- No repetir el título ni la descripción dentro de la página.
-
-### Contenido
-Después del Header, el contenido de la página debe comenzar directamente con una barra de herramientas funcional:
-- buscador;
-- botón de acción principal de la sección, colocado en la misma barra y junto al buscador;
-- botones secundarios como Calendario cuando corresponda;
-- botón de actualizar;
-- cantidad de registros;
-- tabla, tarjetas o contenido específico de la sección.
-
-Las páginas CRUD deben mantener la misma jerarquía, espaciado, bordes, radios, tablas y acciones visuales que el estándar establecido en Facturas.
-
-### Descripciones oficiales
-- Dashboard: `Resumen general de la operación del hotel.`
-- Clientes: `Clientes registrados y sus datos personales.`
-- Huéspedes: `Huéspedes registrados y sus datos personales.`
-- Empleados: `Personal del hotel y sus datos personales.`
-- Habitaciones: `Habitaciones, tipos, ubicación y disponibilidad del hotel.`
-- Reservaciones: `Administración de reservaciones.`
-- Servicios: `Servicios disponibles para las reservaciones del hotel.`
-- Pagos: `Administración y seguimiento de pagos.`
-- Facturas: `Emisión, impuestos y control de facturación del hotel.`
-
-Esta estructura es el estándar visual definitivo y no debe duplicarse o modificarse página por página sin una razón de diseño clara.
-
-
-## 9. Estructura de navegación y comportamiento del layout
-- El Sidebar es fijo (`position: fixed`) y ocupa toda la altura visible (`100vh`); no debe desplazarse con el contenido.
-- El contenido principal debe reservar el ancho del Sidebar mediante `margin-left`.
-- El Header permanece dentro del área principal y sigue la estructura visual definitiva definida arriba.
-- Los botones de acción como `Nuevo cliente`, `Nueva reservación`, `Nueva factura`, etc. pertenecen al contenido de cada página, no al Header, y deben ubicarse en la barra de herramientas junto al buscador.
-- El estándar de Facturas es la referencia visual para tablas CRUD: buscador, actualización, contador, tabla, badges y acciones.
-- Las Reservaciones mantienen la vista de tabla como vista principal y cuentan con un botón secundario `Calendario` que abre un modal interactivo. El calendario no reemplaza la tabla ni ocupa permanentemente espacio adicional.
-- El calendario de Reservaciones debe permitir navegar entre meses, volver a Hoy, visualizar las reservaciones por rango de fechas y seleccionar una reservación para consultar su detalle.
-- Los estados ENUM deben conservar opciones predeterminadas y presentarse con colores semánticos consistentes con Dalssi.
+- Todas las páginas principales usan el mismo patrón visual de Dalssi.
+- El header de página muestra, en este orden: `DALSSI HOTEL`, título de la página y subtítulo/descripcion inmediatamente debajo del título.
+- El sidebar es fijo, ocupa la altura completa de la ventana y no debe desplazarse con el contenido principal.
+- El botón de creación (`Nuevo ...`) permanece dentro del área de contenido, arriba de la toolbar y alineado a la izquierda.
+- La toolbar mantiene la misma estructura: búsqueda, actualizar y contador; Reservaciones puede añadir el acceso a Calendario sin romper la estructura.
+- Tablas, modales, dropdowns y calendarios deben conservar la estética Dalssi: azul profundo, lavanda, fondos claros, bordes suaves y sombras discretas.
+- Los dropdowns personalizados y calendarios deben renderizar sus menús mediante portal para no quedar recortados por modales o contenedores con overflow.
+- Todo campo basado en ENUM debe usar un dropdown con las opciones definidas por el modelo/base de datos; no usar inputs de texto para ENUM.
+- Las opciones ENUM visibles en tablas y detalles deben usar badges con colores semánticos consistentes.
+- Las relaciones FK que el usuario selecciona deben mostrarse como dropdowns y, en detalles/listados cuando sea útil, usar nombres legibles en lugar de IDs.
+- Los modales de detalle deben priorizar información humana y contextual; los IDs solo se muestran cuando aportan valor de referencia.
+- Validar formularios, confirmar eliminaciones y mostrar mensajes claros de éxito o error.
+- El CRUD debe probarse desde el frontend conectado al backend y MySQL; no depender de Postman para la validación funcional principal.

@@ -1,6 +1,5 @@
-.app-shell { min-height: 100vh; display: block; background: #f7f8fc; }
-.main-column { min-height: 100vh; margin-left: 254px; display: flex; flex-direction: column; }
+.app-shell { min-height: 100vh; display: flex; background: #f7f8fc; }
+.main-column { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .page-content { width: 100%; max-width: 1500px; padding: 28px 36px 34px; margin: 0 auto; flex: 1; }
 .app-footer { border-top: 1px solid var(--dalssi-border); padding: 15px 36px; color: #a1a5b4; font-size: 10px; display: flex; justify-content: space-between; }
-@media (max-width: 800px) { .main-column { margin-left: 70px; } }
 @media (max-width: 700px) { .page-content { padding: 22px 16px; } .app-footer { padding: 14px 16px; gap: 8px; flex-wrap: wrap; } }
