@@ -5,6 +5,7 @@ import { getReservationBillingSummary } from '../utils/billing.js';
 const { pagos: Pago, reservaciones: Reservacion, clientes: Cliente, personas: Persona, facturas: Factura } = models;
 const reservationInclude = {
   model: Reservacion,
+  as: 'reservacion',
   include: [
     { model: Cliente, as: 'cliente', include: [{ model: Persona, as: 'persona' }] },
   ],
@@ -46,7 +47,7 @@ export async function availableReservations(req, res, next) {
     const reservations = await Reservacion.findAll({
       include: [
         { model: Cliente, required: true, include: [{ model: Persona, as: 'persona', required: true }] },
-        { model: Pago, required: false },
+        { model: Pago, as: 'pagos', required: false },
       ],
       order: [['fecha_entrada', 'ASC'], ['id_reservacion', 'ASC']],
     });
@@ -138,6 +139,8 @@ export async function remove(req, res, next) {
   try {
     const payment = await Pago.findByPk(req.params.id);
     if (!payment) throw Object.assign(new Error('Pago no encontrado.'), { status: 404 });
+    const invoice = await Factura.findOne({ where: { id_reservacion: payment.id_reservacion } });
+    if (invoice) throw Object.assign(new Error('Este pago está asociado a una factura y no se puede eliminar. El registro debe conservarse.'), { status: 409 });
     await payment.destroy();
     res.json({ message: 'Pago eliminado correctamente.' });
   } catch (error) { next(error); }

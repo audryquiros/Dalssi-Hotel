@@ -39,8 +39,8 @@ export async function getReservationBillingSummary(id_reservacion, transaction) 
   const reservation = await Reservacion.findByPk(id_reservacion, {
     include: [
       { model: Cliente, as: 'cliente', include: [{ model: Persona, as: 'persona' }] },
-      { model: DetalleReservacion, include: [{ model: Habitacion, as: 'habitacion', include: [{ model: TipoHabitacionModel }]}] },
-      { model: ReservacionServicio, include: [{ model: Servicio, as: 'servicio' }] },
+      { model: DetalleReservacion, as: 'detalle_reservacion', include: [{ model: Habitacion, as: 'habitacion', include: [{ model: TipoHabitacionModel }]}] },
+      { model: ReservacionServicio, as: 'reservacion_servicios', include: [{ model: Servicio, as: 'servicio' }] },
     ],
     transaction,
   });
@@ -55,7 +55,7 @@ export async function getReservationBillingSummary(id_reservacion, transaction) 
 
   const rooms = (reservation.detalle_reservacion || []).map(detail => ({
     id_detalle_reservacion: detail.id_detalle_reservacion,
-    descripcion: `Habitación ${detail.habitacion?.numero || '—'}${detail.habitacion?.tipos_habitacion?.nombre ? ` · ${detail.habitacion.tipo_habitacion.nombre}` : ''}`,
+    descripcion: `Habitación ${detail.habitacion?.numero || '—'}${detail.habitacion?.tipos_habitacion?.nombre ? ` · ${detail.habitacion.tipos_habitacion.nombre}` : ''}`,
     cantidad: nights,
     precio_unitario: Number(detail.precio_noche || 0),
     subtotal: roundMoney(Number(detail.precio_noche || 0) * nights),

@@ -52,13 +52,13 @@ ReservacionesModel.belongsTo(ClientesModel, { foreignKey: 'id_cliente', as: 'cli
 EmpleadosModel.hasMany(ReservacionesModel, { foreignKey: 'id_empleado', as: 'reservaciones' });
 ReservacionesModel.belongsTo(EmpleadosModel, { foreignKey: 'id_empleado', as: 'empleado' });
 ReservacionesModel.hasMany(DetalleReservacionModel, { foreignKey: 'id_reservacion', as: 'detalle_reservacion' });
-DetalleReservacionModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion' });
+DetalleReservacionModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion', as: 'reservacion' });
 HabitacionesModel.hasMany(DetalleReservacionModel, { foreignKey: 'id_habitacion', as: 'detalle_reservacion' });
 DetalleReservacionModel.belongsTo(HabitacionesModel, { foreignKey: 'id_habitacion', as: 'habitacion' });
 DetalleReservacionModel.hasMany(DetalleHuespedesModel, { foreignKey: 'id_detalle_reservacion', as: 'detalle_huespedes' });
-DetalleHuespedesModel.belongsTo(DetalleReservacionModel, { foreignKey: 'id_detalle_reservacion' });
+DetalleHuespedesModel.belongsTo(DetalleReservacionModel, { foreignKey: 'id_detalle_reservacion', as: 'detalle_reservacion' });
 HuespedesModel.hasMany(DetalleHuespedesModel, { foreignKey: 'id_huesped', as: 'detalle_huespedes' });
-DetalleHuespedesModel.belongsTo(HuespedesModel, { foreignKey: 'id_huesped' });
+DetalleHuespedesModel.belongsTo(HuespedesModel, { foreignKey: 'id_huesped', as: 'huesped' });
 CategoriasServiciosModel.hasMany(ServiciosModel, { foreignKey: 'id_categoria_servicio', as: 'servicios' });
 ServiciosModel.belongsTo(CategoriasServiciosModel, { foreignKey: 'id_categoria_servicio' });
 ReservacionesModel.hasMany(ReservacionServiciosModel, { foreignKey: 'id_reservacion', as: 'reservacion_servicios' });
@@ -66,9 +66,9 @@ ReservacionServiciosModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reserv
 ServiciosModel.hasMany(ReservacionServiciosModel, { foreignKey: 'id_servicio', as: 'reservacion_servicios' });
 ReservacionServiciosModel.belongsTo(ServiciosModel, { foreignKey: 'id_servicio', as: 'servicio' });
 ReservacionesModel.hasMany(PagosModel, { foreignKey: 'id_reservacion', as: 'pagos' });
-PagosModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion' });
+PagosModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion', as: 'reservacion' });
 ReservacionesModel.hasMany(FacturasModel, { foreignKey: 'id_reservacion', as: 'facturas' });
-FacturasModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion' });
+FacturasModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion', as: 'reservacion' });
 FacturasModel.hasMany(DetalleFacturaModel, { foreignKey: 'id_factura', as: 'detalle_factura' });
-DetalleFacturaModel.belongsTo(FacturasModel, { foreignKey: 'id_factura' });
+DetalleFacturaModel.belongsTo(FacturasModel, { foreignKey: 'id_factura', as: 'factura' });
 

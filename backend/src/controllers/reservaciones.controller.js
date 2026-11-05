@@ -5,8 +5,8 @@ const { reservaciones: Reservacion, clientes: Cliente, empleados: Empleado, pers
 const include = [
   { model: Cliente, as: 'cliente', include: [{ model: Persona, as: 'persona' }] },
   { model: Empleado, as: 'empleado', include: [{ model: Persona, as: 'persona' }] },
-  { model: DetalleReservacion, include: [{ model: Habitacion, as: 'habitacion' }] },
-  { model: ReservacionServicio, include: [{ model: Servicio, as: 'servicio' }] },
+  { model: DetalleReservacion, as: 'detalle_reservacion', include: [{ model: Habitacion, as: 'habitacion' }] },
+  { model: ReservacionServicio, as: 'reservacion_servicios', include: [{ model: Servicio, as: 'servicio' }] },
 ];
 
 export async function list(req, res, next) {

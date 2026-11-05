@@ -13,7 +13,11 @@ const methods = [{value:'sinpe',label:'SINPE'},{value:'transferencia',label:'Tra
 const states = [{value:'pendiente',label:'Pendiente'},{value:'confirmado',label:'Confirmado'},{value:'rechazado',label:'Rechazado'},{value:'anulado',label:'Anulado'}];
 const dateText = value => value ? String(value).slice(0,10).split('-').reverse().join('/') : '—';
 const money = value => `₡${Number(value || 0).toLocaleString('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-const clientName = row => row?.reservacion?.cliente?.persona ? `${row.reservacion.cliente.persona.nombre || ''} ${row.reservacion.cliente.persona.apellidos || ''}`.trim() : `Cliente #${row?.reservacion?.id_cliente || '—'}`;
+const clientName = row => {
+  const person = row?.reservacion?.cliente?.persona;
+  if (person) return `${person.nombre || ''} ${person.apellidos || ''}`.trim() || `Cliente #${row?.reservacion?.id_cliente || row?.id_cliente || '—'}`;
+  return row?.cliente_nombre || `Cliente #${row?.reservacion?.id_cliente || row?.id_cliente || '—'}`;
+};
 const reservationLabel = row => `#${row.id_reservacion} · ${row.cliente_nombre || 'Cliente'} · ${dateText(row.fecha_entrada)}`;
 
 function Breakdown({ summary }) {

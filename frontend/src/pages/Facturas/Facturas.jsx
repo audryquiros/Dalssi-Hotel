@@ -8,7 +8,12 @@ import './Facturas.css';
 
 const money = value => `₡${Number(value || 0).toLocaleString('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 const dateText = value => value ? String(value).slice(0,10).split('-').reverse().join('/') : '—';
-const clientName = row => row?.cliente_nombre || (row?.reservacion?.cliente?.persona ? `${row.reservacion.cliente.persona.nombre || ''} ${row.reservacion.cliente.persona.apellidos || ''}`.trim() : '—');
+const clientName = row => {
+  if (row?.cliente_nombre) return row.cliente_nombre;
+  const person = row?.reservacion?.cliente?.persona;
+  if (person) return `${person.nombre || ''} ${person.apellidos || ''}`.trim() || `Cliente #${row?.reservacion?.id_cliente || row?.id_cliente || '—'}`;
+  return `Cliente #${row?.reservacion?.id_cliente || row?.id_cliente || '—'}`;
+};
 const reservationLabel = row => `#${row.id_reservacion} · ${row.cliente_nombre || clientName(row)} · ${dateText(row.fecha_entrada)}`;
 
 function Breakdown({ details = [] }) {

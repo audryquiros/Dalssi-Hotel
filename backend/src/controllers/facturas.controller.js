@@ -44,7 +44,7 @@ function invoiceDetailsFromSummary(summary) {
 export async function list(req, res, next) {
   try {
     const rows = await Factura.findAll({
-      include: [{ model: Reservacion, include: reservationInclude }],
+      include: [{ model: Reservacion, as: 'reservacion', include: reservationInclude }],
       order: [['id_factura', 'DESC']],
     });
     res.json({ data: rows.map(withDerivedRate) });
@@ -55,13 +55,19 @@ export async function get(req, res, next) {
   try {
     const row = await Factura.findByPk(req.params.id, {
       include: [
-        { model: Reservacion, include: reservationInclude },
+        { model: Reservacion, as: 'reservacion', include: reservationInclude },
         { model: DetalleFactura, as: 'detalle_factura' },
       ],
     });
     if (!row) return res.status(404).json({ message: 'Factura no encontrada.' });
     const data = withDerivedRate(row);
-    data.cliente_nombre = data.reservacion?.cliente ? formatClient(data.reservacion.cliente) : '—';
+    data.cliente_nombre = data.reservacion?.cliente ? formatClient(data.reservacion.cliente) : `Cliente #${data.reservacion?.id_cliente || '—'}`;
+    // Las facturas antiguas pueden no tener detalle_factura persistido. Para no perder el desglose en pantalla/impresión,
+    // se reconstruye desde la reservación usando las mismas reglas de facturación del backend.
+    if (!data.detalle_factura?.length) {
+      const summary = await getReservationBillingSummary(row.id_reservacion);
+      data.detalle_factura = invoiceDetailsFromSummary(summary);
+    }
     res.json({ data });
   } catch (error) { next(error); }
 }
@@ -70,9 +76,9 @@ export async function availableReservations(req, res, next) {
   try {
     const rows = await Reservacion.findAll({
       include: [
-        { model: Cliente, required: true, include: [{ model: Persona, as: 'persona', required: true }] },
-        { model: Pago, required: false },
-        { model: Factura, required: false },
+        { model: Cliente, as: 'cliente', required: true, include: [{ model: Persona, as: 'persona', required: true }] },
+        { model: Pago, as: 'pagos', required: false },
+        { model: Factura, as: 'facturas', required: false },
       ],
       order: [['fecha_entrada', 'ASC'], ['id_reservacion', 'ASC']],
     });
@@ -128,7 +134,7 @@ export async function create(req, res, next) {
     await transaction.commit();
     const data = await Factura.findByPk(created.id_factura, {
       include: [
-        { model: Reservacion, include: reservationInclude },
+        { model: Reservacion, as: 'reservacion', include: reservationInclude },
         { model: DetalleFactura, as: 'detalle_factura' },
       ],
     });
@@ -164,7 +170,7 @@ export async function update(req, res, next) {
     await transaction.commit();
     const data = await Factura.findByPk(invoice.id_factura, {
       include: [
-        { model: Reservacion, include: reservationInclude },
+        { model: Reservacion, as: 'reservacion', include: reservationInclude },
         { model: DetalleFactura, as: 'detalle_factura' },
       ],
     });
