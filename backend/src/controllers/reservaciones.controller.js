@@ -3,10 +3,10 @@ import { models } from '../models/index.js';
 const { reservaciones: Reservacion, clientes: Cliente, empleados: Empleado, personas: Persona, detalle_reservacion: DetalleReservacion, habitaciones: Habitacion, reservacion_servicios: ReservacionServicio, servicios: Servicio } = models;
 
 const include = [
-  { model: Cliente, include: [{ model: Persona, as: 'persona' }] },
-  { model: Empleado, include: [{ model: Persona, as: 'persona' }] },
-  { model: DetalleReservacion, include: [{ model: Habitacion }] },
-  { model: ReservacionServicio, include: [{ model: Servicio }] },
+  { model: Cliente, as: 'cliente', include: [{ model: Persona, as: 'persona' }] },
+  { model: Empleado, as: 'empleado', include: [{ model: Persona, as: 'persona' }] },
+  { model: DetalleReservacion, include: [{ model: Habitacion, as: 'habitacion' }] },
+  { model: ReservacionServicio, include: [{ model: Servicio, as: 'servicio' }] },
 ];
 
 export async function list(req, res, next) {

@@ -6,6 +6,9 @@ const labels = {
   confirmado: 'Confirmado', rechazado: 'Rechazado', anulado: 'Anulado', emitida: 'Emitida', anulada: 'Anulada',
   sinpe: 'SINPE', transferencia: 'Transferencia', tarjeta: 'Tarjeta', efectivo: 'Efectivo'
 };
+
+export const enumLabel = value => labels[String(value || "").toLowerCase()] || String(value || "");
+
 const tone = (field, value) => {
   const key = String(value || '').toLowerCase();
   if (field === 'metodo_pago') return { sinpe:'purple', transferencia:'blue', tarjeta:'sky', efectivo:'green' }[key] || 'neutral';

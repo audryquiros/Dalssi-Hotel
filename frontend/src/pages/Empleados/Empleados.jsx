@@ -129,7 +129,7 @@ export default function Empleados() {
   return (
     <section className="crud-page">
       <div className="crud-heading">
-        <div><p className="crud-description">Personal del hotel y sus datos personales.</p></div>
+        <div></div>
         <button className="crud-primary" onClick={openNew}><Plus size={17} /> Nuevo empleado</button>
       </div>
 

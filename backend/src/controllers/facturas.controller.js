@@ -1,187 +1,114 @@
 import sequelize from '../config/database.js';
 import { models } from '../models/index.js';
+import { calculateTotals, getReservationBillingSummary, formatClient } from '../utils/billing.js';
 
 const {
-  FacturasModel,
-  DetalleFacturaModel,
-  ReservacionesModel,
-  ClientesModel,
-  PersonasModel,
-  DetalleReservacionModel,
-  ReservacionServiciosModel,
-} = {
-  FacturasModel: models.facturas,
-  DetalleFacturaModel: models.detalle_factura,
-  ReservacionesModel: models.reservaciones,
-  ClientesModel: models.clientes,
-  PersonasModel: models.personas,
-  DetalleReservacionModel: models.detalle_reservacion,
-  ReservacionServiciosModel: models.reservacion_servicios,
-};
-
-export const TAX_OPTIONS = [0, 13];
-const DEFAULT_TAX_RATE = 13;
+  facturas: Factura,
+  detalle_factura: DetalleFactura,
+  reservaciones: Reservacion,
+  clientes: Cliente,
+  personas: Persona,
+  pagos: Pago,
+} = models;
 
 const reservationInclude = [
-  {
-    model: ClientesModel,
-    include: [{ model: PersonasModel, as: 'persona' }],
-  },
+  { model: Cliente, as: 'cliente', include: [{ model: Persona, as: 'persona' }] },
 ];
-
-function roundMoney(value) {
-  return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
-}
-
-function calculateTotals(subtotal, taxRate = DEFAULT_TAX_RATE) {
-  const base = roundMoney(subtotal);
-  const rate = Number(taxRate);
-  if (!Number.isFinite(base) || base < 0) {
-    throw Object.assign(new Error('El subtotal debe ser un monto válido mayor o igual a cero.'), { status: 400 });
-  }
-  if (!TAX_OPTIONS.includes(rate)) {
-    throw Object.assign(new Error('La tasa de impuesto seleccionada no es válida.'), { status: 400 });
-  }
-  const impuestos = roundMoney(base * (rate / 100));
-  return {
-    subtotal: base,
-    porcentaje_impuesto: rate,
-    impuestos,
-    total: roundMoney(base + impuestos),
-  };
-}
-
-function formatClient(client) {
-  const person = client?.persona;
-  return `${person?.nombre || ''} ${person?.apellidos || ''}`.trim() || `Cliente #${client?.id_cliente || '—'}`;
-}
-
-async function getReservationSubtotal(id_reservacion, transaction) {
-  const reservation = await ReservacionesModel.findByPk(id_reservacion, {
-    include: reservationInclude,
-    transaction,
-  });
-
-  if (!reservation) {
-    throw Object.assign(new Error('La reservación indicada no existe.'), { status: 400 });
-  }
-
-  const start = new Date(`${reservation.fecha_entrada}T00:00:00`);
-  const end = new Date(`${reservation.fecha_salida}T00:00:00`);
-  const nights = Math.max(1, Math.ceil((end - start) / 86400000));
-
-  const roomDetails = await DetalleReservacionModel.findAll({
-    where: { id_reservacion },
-    transaction,
-  });
-
-  const serviceDetails = await ReservacionServiciosModel.findAll({
-    where: { id_reservacion },
-    transaction,
-  });
-
-  const roomsSubtotal = roomDetails.reduce(
-    (sum, detail) => sum + Number(detail.precio_noche || 0) * nights,
-    0
-  );
-
-  const servicesSubtotal = serviceDetails.reduce(
-    (sum, detail) => sum + Number(detail.subtotal || 0),
-    0
-  );
-
-  return {
-    reservation,
-    subtotal: roundMoney(roomsSubtotal + servicesSubtotal),
-  };
-}
 
 function withDerivedRate(row) {
   const data = row.toJSON ? row.toJSON() : { ...row };
   const subtotal = Number(data.subtotal || 0);
   const impuestos = Number(data.impuestos || 0);
-  data.porcentaje_impuesto = subtotal > 0
-    ? roundMoney((impuestos / subtotal) * 100)
-    : 0;
-
-  if (data.reservacion?.cliente) {
-    data.cliente_nombre = formatClient(data.reservacion.cliente);
-  }
-
+  data.porcentaje_impuesto = subtotal > 0 ? Math.round((impuestos / subtotal) * 10000) / 100 : 0;
+  if (data.reservacion?.cliente) data.cliente_nombre = formatClient(data.reservacion.cliente);
   return data;
+}
+
+function invoiceDetailsFromSummary(summary) {
+  return [
+    ...summary.rooms.map(item => ({
+      descripcion: item.descripcion,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      subtotal: item.subtotal,
+    })),
+    ...summary.services.map(item => ({
+      descripcion: item.descripcion,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      subtotal: item.subtotal,
+    })),
+  ];
 }
 
 export async function list(req, res, next) {
   try {
-    const rows = await FacturasModel.findAll({
-      include: [{
-        model: ReservacionesModel,
-        include: reservationInclude,
-      }],
+    const rows = await Factura.findAll({
+      include: [{ model: Reservacion, include: reservationInclude }],
       order: [['id_factura', 'DESC']],
     });
-
     res.json({ data: rows.map(withDerivedRate) });
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 }
 
 export async function get(req, res, next) {
   try {
-    const row = await FacturasModel.findByPk(req.params.id, {
+    const row = await Factura.findByPk(req.params.id, {
       include: [
-        {
-          model: ReservacionesModel,
-          include: reservationInclude,
-        },
-        { model: DetalleFacturaModel, as: 'detalle_factura' },
+        { model: Reservacion, include: reservationInclude },
+        { model: DetalleFactura, as: 'detalle_factura' },
       ],
     });
-
     if (!row) return res.status(404).json({ message: 'Factura no encontrada.' });
+    const data = withDerivedRate(row);
+    data.cliente_nombre = data.reservacion?.cliente ? formatClient(data.reservacion.cliente) : '—';
+    res.json({ data });
+  } catch (error) { next(error); }
+}
 
-    res.json({ data: withDerivedRate(row) });
-  } catch (error) {
-    next(error);
-  }
+export async function availableReservations(req, res, next) {
+  try {
+    const rows = await Reservacion.findAll({
+      include: [
+        { model: Cliente, required: true, include: [{ model: Persona, as: 'persona', required: true }] },
+        { model: Pago, required: false },
+        { model: Factura, required: false },
+      ],
+      order: [['fecha_entrada', 'ASC'], ['id_reservacion', 'ASC']],
+    });
+
+    const data = rows
+      .filter(row => row.estado !== 'cancelada')
+      .filter(row => row.cliente?.estado !== 'inactivo' && row.cliente?.persona?.estado !== 'inactivo')
+      .filter(row => (row.pagos || []).some(payment => payment.estado === 'confirmado'))
+      .filter(row => !(row.facturas || []).length)
+      .map(row => ({
+        id_reservacion: row.id_reservacion,
+        fecha_entrada: row.fecha_entrada,
+        fecha_salida: row.fecha_salida,
+        cliente_nombre: formatClient(row.cliente),
+      }));
+
+    res.json({ data });
+  } catch (error) { next(error); }
 }
 
 export async function create(req, res, next) {
   const transaction = await sequelize.transaction();
-
   try {
-    const {
-      id_reservacion,
-      porcentaje_impuesto = DEFAULT_TAX_RATE,
-      fecha_emision,
-    } = req.body;
+    const { id_reservacion, fecha_emision } = req.body;
+    if (!id_reservacion) throw Object.assign(new Error('Debe seleccionar una reservación.'), { status: 400 });
 
-    if (!id_reservacion) {
-      throw Object.assign(new Error('Debe seleccionar una reservación.'), { status: 400 });
-    }
+    const existing = await Factura.findOne({ where: { id_reservacion }, transaction, lock: transaction.LOCK.UPDATE });
+    if (existing) throw Object.assign(new Error('La reservación ya tiene una factura asociada.'), { status: 409 });
 
-    const existing = await FacturasModel.findOne({
-      where: { id_reservacion },
-      transaction,
-      lock: transaction.LOCK.UPDATE,
-    });
+    const payment = await Pago.findOne({ where: { id_reservacion, estado: 'confirmado' }, transaction });
+    if (!payment) throw Object.assign(new Error('La reservación debe tener un pago confirmado antes de emitir la factura.'), { status: 400 });
 
-    if (existing) {
-      throw Object.assign(
-        new Error('La reservación ya tiene una factura asociada.'),
-        { status: 409 }
-      );
-    }
+    const summary = await getReservationBillingSummary(id_reservacion, transaction);
+    const totals = calculateTotals(summary.subtotal);
 
-    const { reservation, subtotal } = await getReservationSubtotal(
-      id_reservacion,
-      transaction
-    );
-
-    const totals = calculateTotals(subtotal, porcentaje_impuesto);
-
-    const created = await FacturasModel.create({
+    const created = await Factura.create({
       id_reservacion,
       numero_factura: null,
       fecha_emision: fecha_emision || new Date(),
@@ -193,20 +120,19 @@ export async function create(req, res, next) {
 
     const year = new Date(created.fecha_emision || new Date()).getFullYear();
     const numero_factura = `DAL-${year}-${String(created.id_factura).padStart(4, '0')}`;
-
     await created.update({ numero_factura }, { transaction });
 
+    const details = invoiceDetailsFromSummary(summary).map(item => ({ id_factura: created.id_factura, ...item }));
+    if (details.length) await DetalleFactura.bulkCreate(details, { transaction });
+
     await transaction.commit();
-
-    const data = withDerivedRate(created);
-    data.reservacion = reservation.toJSON();
-    data.cliente_nombre = formatClient(reservation.cliente);
-    data.detalle_factura = [];
-
-    res.status(201).json({
-      message: 'Factura creada correctamente.',
-      data,
+    const data = await Factura.findByPk(created.id_factura, {
+      include: [
+        { model: Reservacion, include: reservationInclude },
+        { model: DetalleFactura, as: 'detalle_factura' },
+      ],
     });
+    res.status(201).json({ message: 'Factura creada correctamente.', data: withDerivedRate(data) });
   } catch (error) {
     await transaction.rollback();
     next(error);
@@ -214,22 +140,47 @@ export async function create(req, res, next) {
 }
 
 export async function update(req, res, next) {
-  return res.status(409).json({
-    message: 'Las facturas emitidas no se editan. Se conservan para impresión y control de facturación.',
-  });
+  const transaction = await sequelize.transaction();
+  try {
+    const invoice = await Factura.findByPk(req.params.id, { transaction });
+    if (!invoice) throw Object.assign(new Error('Factura no encontrada.'), { status: 404 });
+
+    const nextReservation = Number(req.body.id_reservacion || invoice.id_reservacion);
+    const payment = await Pago.findOne({ where: { id_reservacion: nextReservation, estado: 'confirmado' }, transaction });
+    if (!payment) throw Object.assign(new Error('La reservación seleccionada debe tener un pago confirmado.'), { status: 400 });
+
+    if (nextReservation !== Number(invoice.id_reservacion)) {
+      const other = await Factura.findOne({ where: { id_reservacion: nextReservation }, transaction });
+      if (other) throw Object.assign(new Error('La reservación seleccionada ya tiene una factura asociada.'), { status: 409 });
+    }
+
+    const summary = await getReservationBillingSummary(nextReservation, transaction);
+    const totals = calculateTotals(summary.subtotal);
+    await invoice.update({ id_reservacion: nextReservation, subtotal: totals.subtotal, impuestos: totals.impuestos, total: totals.total }, { transaction });
+    await DetalleFactura.destroy({ where: { id_factura: invoice.id_factura }, transaction });
+    const details = invoiceDetailsFromSummary(summary).map(item => ({ id_factura: invoice.id_factura, ...item }));
+    if (details.length) await DetalleFactura.bulkCreate(details, { transaction });
+
+    await transaction.commit();
+    const data = await Factura.findByPk(invoice.id_factura, {
+      include: [
+        { model: Reservacion, include: reservationInclude },
+        { model: DetalleFactura, as: 'detalle_factura' },
+      ],
+    });
+    res.json({ message: 'Factura actualizada correctamente.', data: withDerivedRate(data) });
+  } catch (error) {
+    await transaction.rollback();
+    next(error);
+  }
 }
 
 export async function remove(req, res, next) {
-  return res.status(409).json({
-    message: 'Las facturas no se eliminan. Se conservan para impresión y control de facturación.',
-  });
+  return res.status(409).json({ message: 'Las facturas no se eliminan. Se conservan para impresión y control de facturación.' });
 }
 
 export async function calculate(req, res, next) {
   try {
-    const { subtotal = 0, porcentaje_impuesto = DEFAULT_TAX_RATE } = req.body;
-    res.json({ data: calculateTotals(subtotal, porcentaje_impuesto) });
-  } catch (error) {
-    next(error);
-  }
+    res.json({ data: calculateTotals(req.body.subtotal || 0) });
+  } catch (error) { next(error); }
 }

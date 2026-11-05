@@ -5,12 +5,29 @@ import * as clientesController from '../controllers/clientes.controller.js';
 import * as huespedesController from '../controllers/huespedes.controller.js';
 import * as dashboardController from '../controllers/dashboard.controller.js';
 import * as facturasController from '../controllers/facturas.controller.js';
+import * as pagosController from '../controllers/pagos.controller.js';
+import * as reservacionesController from '../controllers/reservaciones.controller.js';
 
 const router = Router();
 
 router.get('/health', (_req, res) => res.json({ status: 'ok', app: 'Dalssi Hotel API' }));
 router.get('/dashboard', dashboardController.summary);
 
+router.get('/reservaciones', reservacionesController.list);
+router.get('/reservaciones/:id', reservacionesController.get);
+router.post('/reservaciones', reservacionesController.create);
+router.put('/reservaciones/:id', reservacionesController.update);
+router.delete('/reservaciones/:id', reservacionesController.remove);
+
+router.get('/pagos/reservaciones-disponibles', pagosController.availableReservations);
+router.get('/pagos/reservaciones/:id/resumen', pagosController.reservationSummary);
+router.get('/pagos', pagosController.list);
+router.get('/pagos/:id', pagosController.get);
+router.post('/pagos', pagosController.create);
+router.put('/pagos/:id', pagosController.update);
+router.delete('/pagos/:id', pagosController.remove);
+
+router.get('/facturas/reservaciones-disponibles', facturasController.availableReservations);
 router.get('/facturas', facturasController.list);
 router.get('/facturas/:id', facturasController.get);
 router.post('/facturas', facturasController.create);

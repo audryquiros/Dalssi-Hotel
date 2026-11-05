@@ -43,6 +43,7 @@ No modificar el DER ni agregar entidades o relaciones sin indicación del usuari
 - Cada componente debe tener su archivo `.jsx` y su archivo `.css` correspondiente.
 - Las páginas también se organizan en carpetas independientes.
 - Mantener separados componentes, páginas, layouts, rutas, assets y estilos globales.
+- El estilo compartido de las páginas CRUD (`CrudPage.css`) debe cargarse globalmente porque las páginas CRUD reutilizan sus clases aunque no rendericen el componente `CrudPage`. No eliminar esta carga al modificar una página.
 - Evitar componentes monolíticos y código duplicado.
 - Usar nombres descriptivos y consistentes.
 
@@ -64,7 +65,7 @@ No modificar el DER ni agregar entidades o relaciones sin indicación del usuari
 - Todas las páginas principales usan el mismo patrón visual de Dalssi.
 - El header de página muestra, en este orden: `DALSSI HOTEL`, título de la página y subtítulo/descripcion inmediatamente debajo del título.
 - El sidebar es fijo, ocupa la altura completa de la ventana y no debe desplazarse con el contenido principal.
-- El botón de creación (`Nuevo ...`) permanece dentro del área de contenido, arriba de la toolbar y alineado a la izquierda.
+- El botón de creación (`Nuevo ...`) permanece dentro del área de contenido, arriba de la toolbar y alineado a la derecha.
 - La toolbar mantiene la misma estructura: búsqueda, actualizar y contador; Reservaciones puede añadir el acceso a Calendario sin romper la estructura.
 - Tablas, modales, dropdowns y calendarios deben conservar la estética Dalssi: azul profundo, lavanda, fondos claros, bordes suaves y sombras discretas.
 - Los dropdowns personalizados y calendarios deben renderizar sus menús mediante portal para no quedar recortados por modales o contenedores con overflow.
@@ -83,5 +84,19 @@ No modificar el DER ni agregar entidades o relaciones sin indicación del usuari
 - El número de factura lo genera automáticamente el backend con el formato `DAL-AAAA-NNNN`.
 - El impuesto se calcula en el backend. La tasa vigente por defecto es 13% y se conserva el valor monetario calculado en `impuestos`; no se requiere cambiar el esquema de la BD para manejar el porcentaje.
 - El subtotal de una nueva factura se obtiene de los cargos de la reservación: noches de habitación y servicios asociados.
-- Las facturas emitidas son documentos de control histórico: no se editan ni eliminan desde el CRUD. Se pueden consultar e imprimir.
+- Las facturas emitidas no se eliminan físicamente. Se pueden consultar e imprimir y únicamente se permite editar la reservación asociada, siempre que la nueva reservación tenga un pago confirmado; al cambiarla se recalcula el desglose y los totales en backend.
 - En el detalle de una factura se muestra la reservación y el cliente responsable de la reservación. No es necesario mostrar al huésped como titular de la factura.
+
+
+## 10. Reglas funcionales de pagos
+- Una reservación solo puede tener un pago; la BD debe mantener una restricción única sobre `id_reservacion`.
+- Las reservaciones que ya tienen pago no aparecen al crear un nuevo pago.
+- Al seleccionar una reservación, el monto se calcula automáticamente desde noches de habitación y servicios asociados. El frontend muestra el desglose y el total; el backend valida el monto.
+- Los métodos y estados de pago se seleccionan mediante dropdown y se muestran con badges.
+- Un pago confirmado habilita la emisión de la factura correspondiente, siempre que todavía no exista una factura para esa reservación.
+- No se debe emitir una factura para una reservación sin pago confirmado.
+
+## 11. Reglas de historial y estados
+- `personas`, `clientes` y `huespedes` manejan `estado` con `activo` e `inactivo`.
+- Eliminar un cliente o huésped significa inactivarlo, conservando sus registros e historial. La persona asociada también se inactiva.
+- Los registros inactivos no deben aparecer como opciones para nuevas reservaciones.
