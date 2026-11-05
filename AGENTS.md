@@ -74,3 +74,14 @@ No modificar el DER ni agregar entidades o relaciones sin indicación del usuari
 - Los modales de detalle deben priorizar información humana y contextual; los IDs solo se muestran cuando aportan valor de referencia.
 - Validar formularios, confirmar eliminaciones y mostrar mensajes claros de éxito o error.
 - El CRUD debe probarse desde el frontend conectado al backend y MySQL; no depender de Postman para la validación funcional principal.
+
+
+## 9. Reglas funcionales de facturación
+- La factura se relaciona con una reservación; el cliente se obtiene automáticamente desde esa reservación.
+- En la creación de una factura, el usuario solo selecciona una reservación disponible. No debe introducir manualmente el número de factura, subtotal, impuesto ni total.
+- Una reservación puede tener como máximo una factura. Las reservaciones que ya tienen factura no aparecen en el dropdown de nueva factura.
+- El número de factura lo genera automáticamente el backend con el formato `DAL-AAAA-NNNN`.
+- El impuesto se calcula en el backend. La tasa vigente por defecto es 13% y se conserva el valor monetario calculado en `impuestos`; no se requiere cambiar el esquema de la BD para manejar el porcentaje.
+- El subtotal de una nueva factura se obtiene de los cargos de la reservación: noches de habitación y servicios asociados.
+- Las facturas emitidas son documentos de control histórico: no se editan ni eliminan desde el CRUD. Se pueden consultar e imprimir.
+- En el detalle de una factura se muestra la reservación y el cliente responsable de la reservación. No es necesario mostrar al huésped como titular de la factura.

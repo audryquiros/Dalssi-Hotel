@@ -4,11 +4,18 @@ import * as empleadosController from '../controllers/empleados.controller.js';
 import * as clientesController from '../controllers/clientes.controller.js';
 import * as huespedesController from '../controllers/huespedes.controller.js';
 import * as dashboardController from '../controllers/dashboard.controller.js';
+import * as facturasController from '../controllers/facturas.controller.js';
 
 const router = Router();
 
 router.get('/health', (_req, res) => res.json({ status: 'ok', app: 'Dalssi Hotel API' }));
 router.get('/dashboard', dashboardController.summary);
+
+router.get('/facturas', facturasController.list);
+router.get('/facturas/:id', facturasController.get);
+router.post('/facturas', facturasController.create);
+router.put('/facturas/:id', facturasController.update);
+router.delete('/facturas/:id', facturasController.remove);
 
 router.get('/empleados', empleadosController.list);
 router.get('/empleados/:id', empleadosController.get);
