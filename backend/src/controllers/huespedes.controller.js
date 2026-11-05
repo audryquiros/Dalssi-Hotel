@@ -30,9 +30,9 @@ export async function get(req, res, next) {
 export async function create(req, res, next) {
   const transaction = await sequelize.transaction();
   try {
-    const { persona = {}, id_pais } = req.body;
-    const createdPersona = await PersonasModel.create(persona, { transaction });
-    const huesped = await HuespedesModel.create({ id_persona: createdPersona.id_persona, id_pais }, { transaction });
+    const { persona = {}, id_pais, estado = 'activo' } = req.body;
+    const createdPersona = await PersonasModel.create({ ...persona, estado }, { transaction });
+    const huesped = await HuespedesModel.create({ id_persona: createdPersona.id_persona, id_pais, estado }, { transaction });
     await transaction.commit();
     const data = await HuespedesModel.findByPk(huesped.id_huesped, { include: includes });
     res.status(201).json({ message: 'Huésped creado correctamente.', data });
@@ -50,14 +50,16 @@ export async function update(req, res, next) {
       await transaction.rollback();
       return res.status(404).json({ message: 'Huésped no encontrado.' });
     }
-    const { persona = {}, id_pais } = req.body;
+    const { persona = {}, id_pais, estado } = req.body;
     const person = await PersonasModel.findByPk(huesped.id_persona, { transaction });
     if (!person) {
       await transaction.rollback();
       return res.status(409).json({ message: 'La persona asociada al huésped no existe.' });
     }
     await person.update(persona, { transaction });
-    await huesped.update({ id_pais }, { transaction });
+    await huesped.update({ id_pais, ...(estado ? { estado } : {}) }, { transaction });
+    if (estado === 'inactivo') await person.update({ estado: 'inactivo' }, { transaction });
+    if (estado === 'activo') await person.update({ estado: 'activo' }, { transaction });
     await transaction.commit();
     const data = await HuespedesModel.findByPk(huesped.id_huesped, { include: includes });
     res.json({ message: 'Huésped actualizado correctamente.', data });
@@ -75,11 +77,11 @@ export async function remove(req, res, next) {
       await transaction.rollback();
       return res.status(404).json({ message: 'Huésped no encontrado.' });
     }
-    const personId = huesped.id_persona;
-    await huesped.destroy({ transaction });
-    await PersonasModel.destroy({ where: { id_persona: personId }, transaction });
+    const person = await PersonasModel.findByPk(huesped.id_persona, { transaction });
+    await huesped.update({ estado: 'inactivo' }, { transaction });
+    if (person) await person.update({ estado: 'inactivo' }, { transaction });
     await transaction.commit();
-    res.json({ message: 'Huésped eliminado correctamente.' });
+    res.json({ message: 'Huésped inactivado correctamente. El historial se conserva.' });
   } catch (error) {
     await transaction.rollback();
     next(error);
