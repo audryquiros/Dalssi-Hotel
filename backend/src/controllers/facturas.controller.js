@@ -87,7 +87,8 @@ export async function availableReservations(req, res, next) {
       .filter(row => row.estado !== 'cancelada')
       .filter(row => row.cliente?.estado !== 'inactivo' && row.cliente?.persona?.estado !== 'inactivo')
       .filter(row => (row.pagos || []).some(payment => payment.estado === 'confirmado'))
-      .filter(row => !(row.facturas || []).length)
+      // Una factura anulada no bloquea la generación de una nueva.
+      .filter(row => !(row.facturas || []).some(invoice => invoice.estado === 'emitida'))
       .map(row => ({
         id_reservacion: row.id_reservacion,
         fecha_entrada: row.fecha_entrada,
@@ -105,8 +106,12 @@ export async function create(req, res, next) {
     const { id_reservacion, fecha_emision } = req.body;
     if (!id_reservacion) throw Object.assign(new Error('Debe seleccionar una reservación.'), { status: 400 });
 
-    const existing = await Factura.findOne({ where: { id_reservacion }, transaction, lock: transaction.LOCK.UPDATE });
-    if (existing) throw Object.assign(new Error('La reservación ya tiene una factura asociada.'), { status: 409 });
+    const existing = await Factura.findOne({
+      where: { id_reservacion, estado: 'emitida' },
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+    if (existing) throw Object.assign(new Error('La reservación ya tiene una factura emitida.'), { status: 409 });
 
     const payment = await Pago.findOne({ where: { id_reservacion, estado: 'confirmado' }, transaction });
     if (!payment) throw Object.assign(new Error('La reservación debe tener un pago confirmado antes de emitir la factura.'), { status: 400 });
@@ -156,8 +161,11 @@ export async function update(req, res, next) {
     if (!payment) throw Object.assign(new Error('La reservación seleccionada debe tener un pago confirmado.'), { status: 400 });
 
     if (nextReservation !== Number(invoice.id_reservacion)) {
-      const other = await Factura.findOne({ where: { id_reservacion: nextReservation }, transaction });
-      if (other) throw Object.assign(new Error('La reservación seleccionada ya tiene una factura asociada.'), { status: 409 });
+      const other = await Factura.findOne({
+        where: { id_reservacion: nextReservation, estado: 'emitida' },
+        transaction,
+      });
+      if (other) throw Object.assign(new Error('La reservación seleccionada ya tiene una factura emitida.'), { status: 409 });
     }
 
     const summary = await getReservationBillingSummary(nextReservation, transaction);

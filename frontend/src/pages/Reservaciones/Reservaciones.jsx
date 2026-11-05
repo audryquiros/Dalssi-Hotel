@@ -11,6 +11,11 @@ import HotelRoomMap from '../../components/HotelRoomMap/HotelRoomMap.jsx';
 import './Reservaciones.css';
 import { useConfirm } from '../../components/ConfirmDialog/ConfirmDialog.jsx';
 
+const getTodayLocal = () => {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
 const emptyForm = { id_cliente: '', id_empleado: '', fecha_reservacion: '', fecha_entrada: '', fecha_salida: '', estado: 'pendiente', observaciones: '' };
 const states = [
   { value: 'pendiente', label: 'Pendiente' }, { value: 'confirmada', label: 'Confirmada' },
@@ -72,7 +77,7 @@ export default function Reservaciones() {
   const previewTaxes = Math.round(previewSubtotal * 0.13 * 100) / 100;
   const previewSummary = { rooms: previewRooms, services: previewServices, roomsSubtotal: previewRoomsSubtotal, servicesSubtotal: previewServicesSubtotal, subtotal: previewSubtotal, impuestos: previewTaxes, total: Math.round((previewSubtotal + previewTaxes) * 100) / 100 };
   const fetchSummary = async id => { if (!id) return null; try { const result = await api.get('reservaciones', `${id}/resumen`); return result.data; } catch (e) { setError(e.message); return null; } };
-  const openNew = () => { setForm(emptyForm); setSelectedRoom(''); setSelectedServices([]); setServiceToAdd(''); setServiceQuantity(1); setEditSummary(null); setEditing('new'); setError(''); };
+  const openNew = () => { setForm({ ...emptyForm, fecha_reservacion: getTodayLocal() }); setSelectedRoom(''); setSelectedServices([]); setServiceToAdd(''); setServiceQuantity(1); setEditSummary(null); setEditing('new'); setError(''); };
   const openEdit = async row => {
     setForm({ id_cliente: row.id_cliente || '', id_empleado: row.id_empleado || '', fecha_reservacion: String(row.fecha_reservacion || '').slice(0, 10), fecha_entrada: String(row.fecha_entrada || '').slice(0, 10), fecha_salida: String(row.fecha_salida || '').slice(0, 10), estado: row.estado || 'pendiente', observaciones: row.observaciones || '' });
     setSelectedRoom(row.detalle_reservacion?.[0]?.id_habitacion || '');
@@ -149,7 +154,7 @@ export default function Reservaciones() {
     {editing !== null && <div className="crud-modal-backdrop"><form className="crud-modal reservation-edit-modal" onSubmit={save}><div className="crud-modal-head"><h3>{editing === 'new' ? 'Nueva reservación' : 'Editar reservación'}</h3><button type="button" onClick={() => setEditing(null)}><X/></button></div><div className="crud-form-grid">
       <label>Cliente<Select value={form.id_cliente} onChange={e => setForm(v => ({ ...v, id_cliente: e.target.value }))} placeholder="Seleccione cliente" options={clients.map(c => ({ value: c.id_cliente, label: personName(c.persona) }))}/></label>
       <label>Empleado<Select value={form.id_empleado} onChange={e => setForm(v => ({ ...v, id_empleado: e.target.value }))} placeholder="Seleccione empleado" options={employees.map(c => ({ value: c.id_empleado, label: personName(c.persona) }))}/></label>
-      <label>Fecha de reservación<DatePicker value={form.fecha_reservacion} onChange={e => setForm(v => ({ ...v, fecha_reservacion: e.target.value }))}/></label>
+      <label>Fecha de reservación<DatePicker value={form.fecha_reservacion} disabled={editing === 'new'} onChange={e => setForm(v => ({ ...v, fecha_reservacion: e.target.value }))}/></label>
       <label>Entrada<DatePicker value={form.fecha_entrada} onChange={e => setForm(v => ({ ...v, fecha_entrada: e.target.value }))}/></label>
       <label>Salida<DatePicker value={form.fecha_salida} onChange={e => setForm(v => ({ ...v, fecha_salida: e.target.value }))}/></label>
       <label>Estado<Select value={form.estado} onChange={e => setForm(v => ({ ...v, estado: e.target.value }))} placeholder="Seleccione estado" options={states}/></label>
