@@ -130,16 +130,12 @@ export default function Empleados() {
 
   return (
     <section className="crud-page">
-      <div className="crud-heading">
-        <div><p className="crud-description">Personal del hotel y sus datos personales.</p></div>
-        <button className="crud-primary" onClick={openNew}><Plus size={17} /> Nuevo empleado</button>
-      </div>
-
-      <div className="crud-toolbar">
+<div className="crud-toolbar">
         <div className="crud-search">
           <Search size={17} />
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar empleados..." />
         </div>
+        <button className="crud-primary crud-toolbar-primary" onClick={openNew}><Plus size={17} /> Nuevo empleado</button>
         <button className="crud-icon-btn" onClick={load} title="Actualizar"><RefreshCw size={17} /></button>
         <span>{filtered.length} registros</span>
       </div>

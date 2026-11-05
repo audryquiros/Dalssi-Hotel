@@ -59,3 +59,49 @@ No modificar el DER ni agregar entidades o relaciones sin indicación del usuari
 - Manejar errores y validar datos en sus respectivas capas.
 - Consultar antes de tomar decisiones que afecten arquitectura, DER o alcance.
 - Mantener el diseño visual coherente con el branding de Dalssi.
+
+
+## 8. Estructura visual estándar definitiva
+Todas las páginas principales de Dalssi deben seguir esta jerarquía visual:
+
+### Header
+- Mostrar `DALSSI HOTEL`.
+- Debajo mostrar el nombre de la sección en `Playfair Display`.
+- Debajo del nombre mostrar un subtítulo/descripcion breve en `Nunito Sans`.
+- El nombre y subtítulo son responsabilidad del Header/Layout, no del contenido de la página.
+- No repetir el título ni la descripción dentro de la página.
+
+### Contenido
+Después del Header, el contenido de la página debe comenzar directamente con una barra de herramientas funcional:
+- buscador;
+- botón de acción principal de la sección, colocado en la misma barra y junto al buscador;
+- botones secundarios como Calendario cuando corresponda;
+- botón de actualizar;
+- cantidad de registros;
+- tabla, tarjetas o contenido específico de la sección.
+
+Las páginas CRUD deben mantener la misma jerarquía, espaciado, bordes, radios, tablas y acciones visuales que el estándar establecido en Facturas.
+
+### Descripciones oficiales
+- Dashboard: `Resumen general de la operación del hotel.`
+- Clientes: `Clientes registrados y sus datos personales.`
+- Huéspedes: `Huéspedes registrados y sus datos personales.`
+- Empleados: `Personal del hotel y sus datos personales.`
+- Habitaciones: `Habitaciones, tipos, ubicación y disponibilidad del hotel.`
+- Reservaciones: `Administración de reservaciones.`
+- Servicios: `Servicios disponibles para las reservaciones del hotel.`
+- Pagos: `Administración y seguimiento de pagos.`
+- Facturas: `Emisión, impuestos y control de facturación del hotel.`
+
+Esta estructura es el estándar visual definitivo y no debe duplicarse o modificarse página por página sin una razón de diseño clara.
+
+
+## 9. Estructura de navegación y comportamiento del layout
+- El Sidebar es fijo (`position: fixed`) y ocupa toda la altura visible (`100vh`); no debe desplazarse con el contenido.
+- El contenido principal debe reservar el ancho del Sidebar mediante `margin-left`.
+- El Header permanece dentro del área principal y sigue la estructura visual definitiva definida arriba.
+- Los botones de acción como `Nuevo cliente`, `Nueva reservación`, `Nueva factura`, etc. pertenecen al contenido de cada página, no al Header, y deben ubicarse en la barra de herramientas junto al buscador.
+- El estándar de Facturas es la referencia visual para tablas CRUD: buscador, actualización, contador, tabla, badges y acciones.
+- Las Reservaciones mantienen la vista de tabla como vista principal y cuentan con un botón secundario `Calendario` que abre un modal interactivo. El calendario no reemplaza la tabla ni ocupa permanentemente espacio adicional.
+- El calendario de Reservaciones debe permitir navegar entre meses, volver a Hoy, visualizar las reservaciones por rango de fechas y seleccionar una reservación para consultar su detalle.
+- Los estados ENUM deben conservar opciones predeterminadas y presentarse con colores semánticos consistentes con Dalssi.

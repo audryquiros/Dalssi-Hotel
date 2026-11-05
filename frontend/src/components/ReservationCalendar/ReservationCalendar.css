@@ -1,0 +1,31 @@
+.reservation-calendar-backdrop{position:fixed;inset:0;z-index:80;background:rgba(21,26,43,.48);display:grid;place-items:center;padding:22px}
+.reservation-calendar-modal{width:min(1100px,100%);max-height:92vh;overflow:auto;background:#fff;border:1px solid #e8e7ef;border-radius:20px;box-shadow:0 24px 80px rgba(25,30,55,.22);padding:24px}
+.reservation-calendar-header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px}
+.reservation-calendar-kicker{display:block;color:var(--dalssi-lavender);font-size:10px;font-weight:800;letter-spacing:.14em}
+.reservation-calendar-header h2{margin:4px 0 3px;color:var(--dalssi-navy);font:600 24px 'Playfair Display',serif}
+.reservation-calendar-header p{margin:0;color:#8a91a5;font-size:12px}
+.reservation-calendar-close{border:0;background:transparent;color:#777f96;padding:5px;display:grid;place-items:center;border-radius:8px}
+.reservation-calendar-close:hover{background:#f3f2f8;color:var(--dalssi-navy)}
+.reservation-calendar-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.reservation-calendar-toolbar>button{border:0;background:#f1eff8;color:#4b4d75;border-radius:9px;width:36px;height:34px;display:grid;place-items:center}
+.reservation-calendar-toolbar>button:hover{background:#e8e5f3;color:var(--dalssi-navy)}
+.reservation-calendar-toolbar strong{min-width:190px;text-align:center;text-transform:capitalize;color:#303653;font-size:14px}
+.reservation-calendar-toolbar .calendar-today{width:auto;padding:0 12px;margin-left:4px;font-size:11px;font-weight:700}
+.reservation-calendar-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid #ececf2;border-bottom:0;border-radius:12px 12px 0 0;overflow:hidden;background:#f8f8fc}
+.reservation-calendar-weekdays span{padding:10px;text-align:center;color:#7d8498;font-size:10px;font-weight:800;letter-spacing:.06em}
+.reservation-calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid #ececf2;border-top:1px solid #ececf2}
+.reservation-calendar-day{min-height:112px;border-right:1px solid #ececf2;border-bottom:1px solid #ececf2;padding:8px;background:#fff;overflow:hidden}
+.reservation-calendar-day:hover{background:#fcfcfe}
+.reservation-calendar-day.outside{background:#fafafd}.reservation-calendar-day.outside .calendar-day-number{color:#b9bdc9}
+.reservation-calendar-day.today .calendar-day-number{background:var(--dalssi-lavender);color:#fff}
+.calendar-day-number{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;color:#59627a;font-size:11px;font-weight:800;margin-bottom:4px}
+.calendar-events{display:grid;gap:4px}
+.calendar-event{border:0;border-left:3px solid currentColor;border-radius:6px;padding:5px 6px;background:#f4f2fa;color:#5d4f8d;text-align:left;cursor:pointer;display:flex;justify-content:space-between;gap:5px;min-width:0}
+.calendar-event span{font-size:10px;font-weight:800}.calendar-event small{font-size:9px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calendar-event:hover{filter:brightness(.97);transform:translateY(-1px)}
+.calendar-event.pending{background:#fff4e4;color:#996b2d}.calendar-event.confirmed{background:#e9f5ef;color:#32735a}.calendar-event.active{background:#e9effb;color:#46659d}.calendar-event.finished{background:#eef0f4;color:#687185}.calendar-event.cancelled{background:#f8e9ec;color:#9b5964}
+.calendar-more{color:#8a91a5;font-size:9px;padding-left:4px}
+.reservation-calendar-footer{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;padding-top:13px;border-top:1px solid #f0eff5;color:#777f96;font-size:10px}
+.reservation-calendar-footer span{display:flex;align-items:center;gap:5px}.legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block}.legend-dot.pending{background:#d69b43}.legend-dot.confirmed{background:#55a37f}.legend-dot.active{background:#6c8bc8}.legend-dot.finished{background:#8e96a7}.legend-dot.cancelled{background:#bb727c}
+.reservation-calendar-details{display:flex;justify-content:space-between;gap:15px;margin-top:12px;color:#9a9faf;font-size:10px}.reservation-calendar-details strong{color:#626a80}
+@media(max-width:760px){.reservation-calendar-backdrop{padding:10px}.reservation-calendar-modal{padding:16px;border-radius:16px}.reservation-calendar-header h2{font-size:21px}.reservation-calendar-grid{min-width:700px}.reservation-calendar-weekdays{min-width:700px}.reservation-calendar-modal{overflow:auto}.reservation-calendar-day{min-height:95px}.reservation-calendar-details{flex-direction:column}}

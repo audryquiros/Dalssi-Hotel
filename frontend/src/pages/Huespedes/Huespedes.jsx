@@ -25,8 +25,7 @@ export default function Huespedes() {
   const remove=async(row)=>{if(!confirm('¿Eliminar este huésped? También se eliminarán sus datos personales.'))return;try{await api.remove('huespedes',row.id_huesped);await load();}catch(e){setError(e.message);}};
 
   return <section className="crud-page">
-    <div className="crud-heading"><div><p>Huéspedes registrados y sus datos personales.</p></div><button className="crud-primary" onClick={openNew}><Plus size={17}/> Nuevo huésped</button></div>
-    <div className="crud-toolbar"><div className="crud-search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar huéspedes..."/></div><button className="crud-icon-btn" onClick={load} title="Actualizar"><RefreshCw size={17}/></button><span>{filtered.length} registros</span></div>
+<div className="crud-toolbar"><div className="crud-search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar huéspedes..."/></div><button className="crud-primary crud-toolbar-primary" onClick={openNew}><Plus size={17} /> Nuevo huésped</button><button className="crud-icon-btn" onClick={load} title="Actualizar"><RefreshCw size={17}/></button><span>{filtered.length} registros</span></div>
     {error&&<div className="crud-error">{error}</div>}
     <div className="crud-table-wrap">{loading?<p className="crud-state">Cargando información...</p>:filtered.length===0?<div className="crud-state">No hay huéspedes para mostrar.</div>:
       <table className="crud-table"><thead><tr><th>Nombre</th><th>Identificación</th><th>Teléfono</th><th>Correo</th><th>País</th><th>Acciones</th></tr></thead>

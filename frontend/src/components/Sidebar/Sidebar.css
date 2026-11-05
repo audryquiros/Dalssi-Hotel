@@ -1,4 +1,4 @@
-.sidebar { width: 254px; min-height: 100vh; background: #fff; border-right: 1px solid var(--dalssi-border); padding: 27px 17px 18px; display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar { position: fixed; left: 0; top: 0; z-index: 40; width: 254px; min-height: 100vh; background: #fff; border-right: 1px solid var(--dalssi-border); padding: 27px 17px 18px; display: flex; flex-direction: column; flex-shrink: 0; }
 .sidebar-brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 35px; }
 .sidebar-brand img { width: 43px; height: 43px; object-fit: contain; }
 .sidebar-brand strong { display: block; color: var(--dalssi-navy); font: 700 20px 'Playfair Display', serif; letter-spacing: 3px; }
