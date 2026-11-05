@@ -126,6 +126,9 @@ export async function update(req, res, next) {
     if (!payment) throw Object.assign(new Error('Pago no encontrado.'), { status: 404 });
 
     const previousState = payment.estado;
+    if (previousState === 'anulado') {
+      throw Object.assign(new Error('Un pago anulado no se puede editar ni reactivar.'), { status: 409 });
+    }
     const nextState = req.body.estado ?? previousState;
     const nextReservation = req.body.id_reservacion ?? payment.id_reservacion;
 
@@ -179,6 +182,9 @@ export async function remove(req, res, next) {
   try {
     const payment = await Pago.findByPk(req.params.id);
     if (!payment) throw Object.assign(new Error('Pago no encontrado.'), { status: 404 });
+    if (payment.estado === 'anulado') {
+      throw Object.assign(new Error('Un pago anulado no se puede eliminar. El registro se conserva como historial.'), { status: 409 });
+    }
     const invoice = await Factura.findOne({ where: { id_reservacion: payment.id_reservacion } });
     if (invoice) throw Object.assign(new Error('Este pago está asociado a una factura y no se puede eliminar. El registro debe conservarse.'), { status: 409 });
     await payment.destroy();

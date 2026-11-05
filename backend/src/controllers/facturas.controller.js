@@ -155,6 +155,9 @@ export async function update(req, res, next) {
   try {
     const invoice = await Factura.findByPk(req.params.id, { transaction });
     if (!invoice) throw Object.assign(new Error('Factura no encontrada.'), { status: 404 });
+    if (invoice.estado === 'anulada') {
+      throw Object.assign(new Error('Una factura anulada no se puede editar ni reactivar.'), { status: 409 });
+    }
 
     const nextReservation = Number(req.body.id_reservacion || invoice.id_reservacion);
     const payment = await Pago.findOne({ where: { id_reservacion: nextReservation, estado: 'confirmado' }, transaction });
