@@ -8,6 +8,7 @@ import * as facturasController from '../controllers/facturas.controller.js';
 import * as pagosController from '../controllers/pagos.controller.js';
 import * as reservacionesController from '../controllers/reservaciones.controller.js';
 import * as authController from '../controllers/auth.controller.js';
+import * as clientController from '../controllers/client.controller.js';
 import * as usuariosController from '../controllers/usuarios.controller.js';
 import { authenticate, authorizeUserType } from '../middleware/auth.middleware.js';
 
@@ -21,16 +22,10 @@ router.post('/auth/logout', authenticate, authController.logout);
 
 router.use(authenticate);
 
-router.get('/cliente/reservaciones', authorizeUserType('cliente'), async (req, res, next) => {
-  try {
-    const { models } = await import('../models/index.js');
-    const data = await models.reservaciones.findAll({
-      where: { id_cliente: req.user.id_cliente },
-      order: [['fecha_entrada', 'DESC']],
-    });
-    res.json({ data });
-  } catch (error) { next(error); }
-});
+router.get('/cliente/reservaciones', authorizeUserType('cliente'), clientController.listReservations);
+router.get('/cliente/reservaciones/:id', authorizeUserType('cliente'), clientController.getReservation);
+router.put('/cliente/reservaciones/:id', authorizeUserType('cliente'), clientController.updateReservation);
+router.get('/cliente/reservaciones/:id/factura', authorizeUserType('cliente'), clientController.getInvoice);
 
 router.get('/cliente/habitaciones', authorizeUserType('cliente'), async (req, res, next) => {
   try {

@@ -25,5 +25,8 @@ export const api = {
   dashboard: () => request('/dashboard'),
   health: () => request('/health'),
   clientReservations: () => request('/cliente/reservaciones'),
+  clientReservation: (id) => request(`/cliente/reservaciones/${id}`),
+  updateClientReservation: (id, data) => request(`/cliente/reservaciones/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  clientInvoice: (id) => request(`/cliente/reservaciones/${id}/factura`),
   clientRooms: () => request('/cliente/habitaciones'),
 }

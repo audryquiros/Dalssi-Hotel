@@ -1,2 +1,5 @@
 @import '../Login/Login.css';
-.register-card{max-width:560px}.register-form{gap:15px}.auth-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:560px){.auth-card{padding:26px}.auth-two{grid-template-columns:1fr}}
+.register-card{max-width:560px}
+.register-form{gap:15px}
+.auth-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.auth-card{padding:26px}.auth-two{grid-template-columns:1fr}}

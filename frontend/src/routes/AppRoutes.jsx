@@ -14,6 +14,8 @@ import Register from '../pages/Register/Register.jsx'
 import Landing from '../pages/Landing/Landing.jsx'
 import ClientHome from '../pages/ClientHome/ClientHome.jsx'
 import ClientReservations from '../pages/ClientReservations/ClientReservations.jsx'
+import ClientProfile from '../pages/ClientProfile/ClientProfile.jsx'
+import ClientInvoice from '../pages/ClientInvoice/ClientInvoice.jsx'
 import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute.jsx'
 
 export default function AppRoutes() {
@@ -39,6 +41,8 @@ export default function AppRoutes() {
     <Route element={<ProtectedRoute role="cliente" />}>
       <Route path="/cliente" element={<ClientHome />} />
       <Route path="/cliente/reservaciones" element={<ClientReservations />} />
+      <Route path="/cliente/perfil" element={<ClientProfile />} />
+      <Route path="/cliente/reservaciones/:id/factura" element={<ClientInvoice />} />
     </Route>
 
     <Route path="*" element={<Navigate to="/" replace />} />
