@@ -9,14 +9,15 @@
     "db:create": "node database/create-database.js",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:status": "sequelize-cli db:migrate:status",
-    "db:migrate:undo": "sequelize-cli db:migrate:undo"
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:seed": "node database/seed.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mysql2": "^3.24.6",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.9",

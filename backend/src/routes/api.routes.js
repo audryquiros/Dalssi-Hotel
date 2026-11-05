@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import * as controller from '../controllers/crud.controller.js';
+import * as empleadosController from '../controllers/empleados.controller.js';
 const router = Router();
 router.get('/health', (_req, res) => res.json({ status: 'ok', app: 'Dalssi Hotel API' }));
+router.get('/empleados', empleadosController.list);
+router.get('/empleados/:id', empleadosController.get);
+router.post('/empleados', empleadosController.create);
+router.put('/empleados/:id', empleadosController.update);
+router.delete('/empleados/:id', empleadosController.remove);
 router.get('/:table', controller.list);
 router.get('/:table/:id', controller.get);
 router.post('/:table', controller.create);

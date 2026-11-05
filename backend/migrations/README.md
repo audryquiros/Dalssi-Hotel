@@ -1,5 +1,18 @@
-# Migraciones Sequelize
+# Migraciones de Dalssi
 
-Las migraciones versionan cambios del esquema. La migración inicial incluida registra la estructura existente de Dalssi como línea base y valida que las 16 tablas del DER ya existan.
+Las migraciones se ejecutan con Sequelize CLI.
 
-Para bases nuevas, ejecutar primero `npm run db:create` y después `npm run db:migrate`. No usar `sequelize.sync({ alter: true })`: el esquema oficial está en `database/schema.sql`.
+```bash
+npm run db:migrate
+npm run db:migrate:status
+```
+
+La migración `20261104000100-baseline-dalssi.js` verifica el esquema existente y no elimina tablas ni datos.
+
+La migración `20261104000200-empleados-persona.js` ajusta `empleados` para utilizar `id_persona` como llave foránea hacia `personas`, manteniendo `id_empleado` como llave primaria.
+
+No usar `sequelize.sync({ alter: true })` para modificar el esquema aprobado.
+
+## Puesto de empleados
+
+La migración `20261104000300-empleados-puesto.js` crea el catálogo `puesto` y reemplaza el texto `empleados.puesto` por `empleados.id_puesto` como llave foránea. Los puestos existentes se migran automáticamente antes de eliminar la columna de texto.

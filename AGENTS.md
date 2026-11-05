@@ -8,16 +8,19 @@ Desarrollar una aplicación web de gestión hotelera para Dalssi, un hotel ficti
 - Estilos: Tailwind CSS 4 y CSS por componente cuando corresponda.
 - Navegación: React Router.
 - Iconografía: Lucide React.
-- Backend (etapa posterior): Node.js + Express.
-- Base de datos (etapa posterior): MySQL, conectada y gestionada desde el backend.
+- Backend: Node.js + Express.
+- ORM: Sequelize.
+- Base de datos: MySQL, conectada y gestionada desde el backend.
+- Migraciones: Sequelize CLI.
+- Arquitectura backend: Modelo-Vista-Controlador (Models, Controllers, Routes).
 
 ## 3. Orden de desarrollo
 1. Construir y validar el frontend.
-2. Desarrollar el backend.
-3. Desde el backend, configurar la conexión y los scripts de creación de MySQL conforme al DER aprobado.
-4. Integrar frontend y backend.
+2. Desarrollar el backend con arquitectura MVC y Sequelize.
+3. Desde el backend, configurar la conexión, migraciones y scripts de MySQL conforme al DER aprobado.
+4. Integrar frontend y backend y validar los CRUD desde la interfaz.
 
-No adelantar etapas sin indicación del usuario.
+No modificar el DER ni agregar entidades o relaciones sin indicación del usuario.
 
 ## 4. Identidad de marca
 - Nombre: Dalssi Hotel.

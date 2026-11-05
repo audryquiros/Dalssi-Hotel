@@ -3,6 +3,7 @@ import ClientesModel from './ClientesModel.js';
 import PaisesModel from './PaisesModel.js';
 import HuespedesModel from './HuespedesModel.js';
 import EmpleadosModel from './EmpleadosModel.js';
+import PuestoModel from './PuestoModel.js';
 import TiposHabitacionModel from './TiposHabitacionModel.js';
 import HabitacionesModel from './HabitacionesModel.js';
 import ReservacionesModel from './ReservacionesModel.js';
@@ -20,6 +21,7 @@ export const models = {
   paises: PaisesModel,
   huespedes: HuespedesModel,
   empleados: EmpleadosModel,
+  puesto: PuestoModel,
   tipos_habitacion: TiposHabitacionModel,
   habitaciones: HabitacionesModel,
   reservaciones: ReservacionesModel,
@@ -37,6 +39,10 @@ PersonasModel.hasMany(ClientesModel, { foreignKey: 'id_persona', as: 'clientes' 
 ClientesModel.belongsTo(PersonasModel, { foreignKey: 'id_persona' });
 PersonasModel.hasMany(HuespedesModel, { foreignKey: 'id_persona', as: 'huespedes' });
 HuespedesModel.belongsTo(PersonasModel, { foreignKey: 'id_persona' });
+PersonasModel.hasOne(EmpleadosModel, { foreignKey: 'id_persona', as: 'empleado' });
+EmpleadosModel.belongsTo(PersonasModel, { foreignKey: 'id_persona', as: 'persona' });
+PuestoModel.hasMany(EmpleadosModel, { foreignKey: 'id_puesto', as: 'empleados' });
+EmpleadosModel.belongsTo(PuestoModel, { foreignKey: 'id_puesto', as: 'puesto' });
 PaisesModel.hasMany(HuespedesModel, { foreignKey: 'id_pais', as: 'huespedes' });
 HuespedesModel.belongsTo(PaisesModel, { foreignKey: 'id_pais' });
 TiposHabitacionModel.hasMany(HabitacionesModel, { foreignKey: 'id_tipo_habitacion', as: 'habitaciones' });

@@ -22,11 +22,18 @@ CREATE TABLE IF NOT EXISTS huespedes (
   CONSTRAINT fk_huespedes_personas FOREIGN KEY (id_persona) REFERENCES personas(id_persona),
   CONSTRAINT fk_huespedes_paises FOREIGN KEY (id_pais) REFERENCES paises(id_pais)
 );
+CREATE TABLE IF NOT EXISTS puesto (
+  id_puesto INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(60) NOT NULL UNIQUE
+);
 CREATE TABLE IF NOT EXISTS empleados (
   id_empleado INT AUTO_INCREMENT PRIMARY KEY,
-  identificacion VARCHAR(15), nombre VARCHAR(50), apellidos VARCHAR(60), telefono VARCHAR(30),
-  correo VARCHAR(100), puesto VARCHAR(60), fecha_contratacion DATETIME,
-  estado ENUM('activo','inactivo')
+  id_persona INT NOT NULL UNIQUE,
+  id_puesto INT NOT NULL,
+  fecha_contratacion DATETIME,
+  estado ENUM('activo','inactivo'),
+  CONSTRAINT fk_empleados_personas FOREIGN KEY (id_persona) REFERENCES personas(id_persona),
+  CONSTRAINT fk_empleados_puesto FOREIGN KEY (id_puesto) REFERENCES puesto(id_puesto)
 );
 CREATE TABLE IF NOT EXISTS tipos_habitacion (
   id_tipo_habitacion INT AUTO_INCREMENT PRIMARY KEY,
