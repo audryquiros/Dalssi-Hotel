@@ -15,6 +15,9 @@ router.get('/dashboard', dashboardController.summary);
 
 router.get('/reservaciones', reservacionesController.list);
 router.get('/reservaciones/:id', reservacionesController.get);
+router.get('/reservaciones/:id/resumen', reservacionesController.summary);
+router.put('/reservaciones/:id/servicios', reservacionesController.replaceServices);
+router.put('/reservaciones/:id/habitacion', reservacionesController.replaceRoom);
 router.post('/reservaciones', reservacionesController.create);
 router.put('/reservaciones/:id', reservacionesController.update);
 router.delete('/reservaciones/:id', reservacionesController.remove);

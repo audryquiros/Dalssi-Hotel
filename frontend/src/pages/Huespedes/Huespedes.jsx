@@ -5,10 +5,12 @@ import Select from '../../components/Select/Select.jsx';
 import DetailModal from '../../components/DetailModal/DetailModal.jsx';
 import EnumBadge from '../../components/EnumBadge/EnumBadge.jsx';
 import './Huespedes.css';
+import { useConfirm } from '../../components/ConfirmDialog/ConfirmDialog.jsx';
 
 const emptyForm = { identificacion:'', nombre:'', apellidos:'', telefono:'', correo:'', id_pais:'', estado:'activo' };
 
 export default function Huespedes() {
+  const confirm = useConfirm();
   const [rows,setRows]=useState([]),[paises,setPaises]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[query,setQuery]=useState('');
   const [editing,setEditing]=useState(null),[viewing,setViewing]=useState(null),[form,setForm]=useState(emptyForm),[saving,setSaving]=useState(false);
 
@@ -23,7 +25,7 @@ export default function Huespedes() {
   const save=async(e)=>{e.preventDefault();setSaving(true);setError('');const data={persona:{identificacion:form.identificacion,nombre:form.nombre,apellidos:form.apellidos,telefono:form.telefono,correo:form.correo},id_pais:Number(form.id_pais),estado:form.estado};
     try{if(editing==='new')await api.create('huespedes',data);else await api.update('huespedes',editing,data);setEditing(null);await load();}catch(e){setError(e.message);}finally{setSaving(false);}
   };
-  const remove=async(row)=>{if(!confirm('¿Inactivar este huésped? Se conservará su información e historial.'))return;try{await api.remove('huespedes',row.id_huesped);await load();}catch(e){setError(e.message);}};
+  const remove=async(row)=>{if(!(await confirm('¿Inactivar este huésped? Se conservará su información e historial.')))return;try{await api.remove('huespedes',row.id_huesped);await load();}catch(e){setError(e.message);}};
 
   return <section className="crud-page">
     <div className="crud-heading"><div></div><button className="crud-primary" onClick={openNew}><Plus size={17}/> Nuevo huésped</button></div>

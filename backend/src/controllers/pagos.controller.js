@@ -1,6 +1,6 @@
 import sequelize from '../config/database.js';
 import { models } from '../models/index.js';
-import { getReservationBillingSummary } from '../utils/billing.js';
+import { getReservationBillingSummary, createInvoiceForReservation } from '../utils/billing.js';
 
 const { pagos: Pago, reservaciones: Reservacion, clientes: Cliente, personas: Persona, facturas: Factura } = models;
 const reservationInclude = {
@@ -21,7 +21,9 @@ export async function list(req, res, next) {
       try {
         const summary = await getReservationBillingSummary(row.id_reservacion);
         json.desglose = summary;
-        json.facturable = paymentHasConfirmed(row) && !(await Factura.findOne({ where: { id_reservacion: row.id_reservacion } }));
+        const invoice = await Factura.findOne({ where: { id_reservacion: row.id_reservacion } });
+        json.facturable = false;
+        json.factura_generada = Boolean(invoice);
       } catch (_) {
         json.facturable = false;
       }
@@ -46,7 +48,7 @@ export async function availableReservations(req, res, next) {
   try {
     const reservations = await Reservacion.findAll({
       include: [
-        { model: Cliente, required: true, include: [{ model: Persona, as: 'persona', required: true }] },
+        { model: Cliente, as: 'cliente', required: true, include: [{ model: Persona, as: 'persona', required: true }] },
         { model: Pago, as: 'pagos', required: false },
       ],
       order: [['fecha_entrada', 'ASC'], ['id_reservacion', 'ASC']],
@@ -97,12 +99,16 @@ export async function create(req, res, next) {
       estado,
     }, { transaction });
 
+    let invoice = null;
+    if (paymentHasConfirmed(payment)) invoice = await createInvoiceForReservation(id_reservacion, transaction);
+
     await transaction.commit();
     const data = await Pago.findByPk(payment.id_pago, { include: [reservationInclude] });
     const json = data.toJSON();
     json.desglose = await getReservationBillingSummary(payment.id_reservacion);
-    json.facturable = paymentHasConfirmed(payment);
-    res.status(201).json({ message: paymentHasConfirmed(payment) ? 'Pago registrado correctamente. Ya puede emitirse la factura.' : 'Pago registrado correctamente.', data: json });
+    json.facturable = false;
+    json.factura_generada = Boolean(invoice);
+    res.status(201).json({ message: invoice ? 'Pago registrado correctamente. Factura generada automáticamente.' : 'Pago registrado correctamente.', data: json });
   } catch (error) {
     await transaction.rollback();
     next(error);
@@ -123,12 +129,15 @@ export async function update(req, res, next) {
     const nextAmount = req.body.monto == null || req.body.monto === '' ? summary.total : Number(req.body.monto);
     if (Math.abs(nextAmount - summary.total) > 0.01) return res.status(400).json({ message: `El monto debe coincidir con el total de la reservación: ₡${summary.total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}.` });
     await payment.update({ ...req.body, monto: summary.total }, { transaction });
+    let invoice = null;
+    if (paymentHasConfirmed(payment)) invoice = await createInvoiceForReservation(payment.id_reservacion, transaction);
     await transaction.commit();
     const data = await Pago.findByPk(payment.id_pago, { include: [reservationInclude] });
     const json = data.toJSON();
     json.desglose = await getReservationBillingSummary(payment.id_reservacion);
-    json.facturable = paymentHasConfirmed(payment) && !(await Factura.findOne({ where: { id_reservacion: payment.id_reservacion } }));
-    res.json({ message: 'Pago actualizado correctamente.', data: json });
+    json.facturable = false;
+    json.factura_generada = Boolean(invoice);
+    res.json({ message: invoice ? 'Pago actualizado correctamente. Factura generada automáticamente.' : 'Pago actualizado correctamente.', data: json });
   } catch (error) {
     await transaction.rollback();
     next(error);

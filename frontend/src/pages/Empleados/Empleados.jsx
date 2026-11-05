@@ -7,6 +7,7 @@ import DetailModal from '../../components/DetailModal/DetailModal.jsx';
 import EnumBadge from '../../components/EnumBadge/EnumBadge.jsx';
 import CatalogManager from '../../components/CatalogManager/CatalogManager.jsx';
 import './Empleados.css';
+import { useConfirm } from '../../components/ConfirmDialog/ConfirmDialog.jsx';
 
 const emptyForm = {
   identificacion: '',
@@ -20,6 +21,7 @@ const emptyForm = {
 };
 
 export default function Empleados() {
+  const confirm = useConfirm();
   const [rows, setRows] = useState([]);
   const [puestos, setPuestos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +119,7 @@ export default function Empleados() {
   };
 
   const remove = async (row) => {
-    if (!confirm('¿Eliminar este empleado? La información de la persona se conservará.')) return;
+    if (!(await confirm('¿Eliminar este empleado? La información de la persona se conservará.'))) return;
     try {
       await api.remove('empleados', row.id_empleado);
       await load();

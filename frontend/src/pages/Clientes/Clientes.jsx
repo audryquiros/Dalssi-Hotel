@@ -6,6 +6,7 @@ import DatePicker from '../../components/DatePicker/DatePicker.jsx';
 import DetailModal from '../../components/DetailModal/DetailModal.jsx';
 import EnumBadge from '../../components/EnumBadge/EnumBadge.jsx';
 import './Clientes.css';
+import { useConfirm } from '../../components/ConfirmDialog/ConfirmDialog.jsx';
 
 const emptyForm = { identificacion:'', nombre:'', apellidos:'', telefono:'', correo:'', direccion:'', fecha_registro:'', estado:'activo' };
 
@@ -16,6 +17,7 @@ const dateText = (value) => {
 };
 
 export default function Clientes() {
+  const confirm = useConfirm();
   const [rows,setRows]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[query,setQuery]=useState('');
   const [editing,setEditing]=useState(null),[viewing,setViewing]=useState(null),[form,setForm]=useState(emptyForm),[saving,setSaving]=useState(false);
 
@@ -36,7 +38,7 @@ export default function Clientes() {
   const save=async(e)=>{e.preventDefault();setSaving(true);setError('');const data={persona:{identificacion:form.identificacion,nombre:form.nombre,apellidos:form.apellidos,telefono:form.telefono,correo:form.correo},direccion:form.direccion,fecha_registro:form.fecha_registro||null,estado:form.estado};
     try{if(editing==='new')await api.create('clientes',data);else await api.update('clientes',editing,data);setEditing(null);await load();}catch(e){setError(e.message);}finally{setSaving(false);}
   };
-  const remove=async(row)=>{if(!confirm('¿Inactivar este cliente? Se conservará su información e historial.'))return;try{await api.remove('clientes',row.id_cliente);await load();}catch(e){setError(e.message);}};
+  const remove=async(row)=>{if(!(await confirm('¿Inactivar este cliente? Se conservará su información e historial.')))return;try{await api.remove('clientes',row.id_cliente);await load();}catch(e){setError(e.message);}};
 
   return <section className="crud-page">
     <div className="crud-heading"><div></div><button className="crud-primary" onClick={openNew}><Plus size={17}/> Nuevo cliente</button></div>

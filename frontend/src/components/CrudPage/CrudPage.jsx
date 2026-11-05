@@ -6,6 +6,7 @@ import Select from '../Select/Select.jsx';
 import DatePicker from '../DatePicker/DatePicker.jsx';
 import EnumBadge from '../EnumBadge/EnumBadge.jsx';
 import './CrudPage.css';
+import { useConfirm } from '../ConfirmDialog/ConfirmDialog.jsx';
 
 const labels = {
   id_persona:'ID persona', identificacion:'Identificación', nombre:'Nombre', apellidos:'Apellidos', telefono:'Teléfono', correo:'Correo', direccion:'Dirección', fecha_registro:'Fecha de registro', id_pais:'País', id_cliente:'Cliente', id_empleado:'Empleado', fecha_reservacion:'Fecha de reservación', fecha_entrada:'Entrada', fecha_salida:'Salida', estado:'Estado', numero:'Número', piso:'Piso', ubicacion:'Ubicación', id_tipo_habitacion:'Tipo de habitación', id_huesped:'Huésped', id_reservacion:'Reservación', monto:'Monto', metodo_pago:'Método de pago', fecha_pago:'Fecha de pago', numero_factura:'Número de factura', fecha_emision:'Fecha de emisión', subtotal:'Subtotal', impuestos:'Impuesto', porcentaje_impuesto:'Tasa de impuesto', total:'Total', cliente_nombre:'Cliente', precio:'Precio', descripcion:'Descripción', puesto:'Puesto', fecha_contratacion:'Contratación'
@@ -43,6 +44,7 @@ const relationKey = (table, key) => `${table}.${key}`;
 const isSingleReservationRelation = table => table === 'pagos' || table === 'facturas';
 
 export default function CrudPage({ table, title, description = `Administración de ${title.toLowerCase()}.` }) {
+  const confirm = useConfirm();
   const [rows,setRows]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[success,setSuccess]=useState(''),[query,setQuery]=useState(''),[editing,setEditing]=useState(null),[form,setForm]=useState({}),[saving,setSaving]=useState(false),[viewing,setViewing]=useState(null),[relations,setRelations]=useState({});
 
   const load=async()=>{setLoading(true);setError('');try{const result=await api.list(table);setRows(result.data||[]);}catch(e){setError(e.message);}finally{setLoading(false);}};
@@ -63,7 +65,7 @@ export default function CrudPage({ table, title, description = `Administración 
   const openNew=()=>{setEditing('new');setForm({});setError('');setSuccess('');};
   const openEdit=row=>{setEditing(row[Object.keys(row).find(k=>k.startsWith('id_'))]);setForm({...row});setError('');setSuccess('');};
   const save=async e=>{e.preventDefault();setError('');setSuccess('');const requiredKey=editableKeys.find(k=>(enumOptions[`${table}.${k}`]||relationConfig[relationKey(table,k)])&&!form[k]);if(requiredKey){setError(`Debes seleccionar ${labels[requiredKey]?.toLowerCase()||requiredKey.replaceAll('_',' ')}.`);return;}setSaving(true);try{const idKey=Object.keys(form).find(k=>k.startsWith('id_')&&k===`id_${table.replace(/s$/,'')}`);const data={...form};Object.keys(data).filter(k=>k.startsWith('id_')&&(!data[k]||k===idKey)).forEach(k=>delete data[k]);Object.keys(data).filter(k=>relationConfig[relationKey(table,k)]).forEach(k=>{if(data[k]!==''&&data[k]!==null)data[k]=Number(data[k]);});Object.keys(data).filter(k=>isMoneyField(k)).forEach(k=>{if(data[k]!==''&&data[k]!==null)data[k]=Number(data[k]);});if(editing==='new')await api.create(table,data);else {const primary=columns.find(k=>k.startsWith('id_'));await api.update(table,editing,Object.fromEntries(Object.entries(data).filter(([k])=>k!==primary)));}setEditing(null);await load();setSuccess(editing==='new'?'Registro creado correctamente.':'Registro actualizado correctamente.');}catch(e){setError(e.message);}finally{setSaving(false);}};
-  const remove=async row=>{const primary=Object.keys(row).find(k=>k.startsWith('id_'));if(!primary||!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.'))return;setError('');setSuccess('');try{await api.remove(table,row[primary]);await load();setSuccess('Registro eliminado correctamente.');}catch(e){setError(e.message);}};
+  const remove=async row=>{const primary=Object.keys(row).find(k=>k.startsWith('id_'));if(!primary||!(await confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')))return;setError('');setSuccess('');try{await api.remove(table,row[primary]);await load();setSuccess('Registro eliminado correctamente.');}catch(e){setError(e.message);}};
   const editableKeys = table === 'facturas'
     ? ['id_reservacion']
     : rows[0]

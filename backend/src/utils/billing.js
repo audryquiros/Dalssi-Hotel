@@ -9,6 +9,8 @@ const {
   tipos_habitacion: TipoHabitacionModel,
   reservacion_servicios: ReservacionServicio,
   servicios: Servicio,
+  facturas: Factura,
+  detalle_factura: DetalleFactura,
 } = models;
 
 export const DEFAULT_TAX_RATE = 13;
@@ -84,4 +86,63 @@ export async function getReservationBillingSummary(id_reservacion, transaction) 
     servicesSubtotal: roundMoney(servicesSubtotal),
     ...totals,
   };
+}
+
+
+export async function createInvoiceForReservation(id_reservacion, transaction) {
+  // Una reservación solo puede tener una factura. Si existe una factura anulada
+  // creada previamente para esta reservación, se reactiva al confirmar el pago
+  // en lugar de intentar insertar otra y provocar ER_DUP_ENTRY.
+  const existing = await Factura.findOne({
+    where: { id_reservacion },
+    transaction,
+    lock: transaction?.LOCK?.UPDATE,
+  });
+
+  const summary = await getReservationBillingSummary(id_reservacion, transaction);
+  const totals = calculateTotals(summary.subtotal);
+
+  const invoice = existing || await Factura.create({
+    id_reservacion,
+    numero_factura: null,
+    fecha_emision: new Date(),
+    subtotal: totals.subtotal,
+    impuestos: totals.impuestos,
+    total: totals.total,
+    estado: 'emitida',
+  }, { transaction });
+
+  const fechaEmision = existing?.fecha_emision || new Date();
+  const year = new Date(fechaEmision).getFullYear();
+  const numero_factura = existing?.numero_factura || `DAL-${year}-${String(invoice.id_factura).padStart(4, '0')}`;
+  await invoice.update({
+    fecha_emision: fechaEmision,
+    subtotal: totals.subtotal,
+    impuestos: totals.impuestos,
+    total: totals.total,
+    estado: 'emitida',
+    numero_factura,
+  }, { transaction });
+
+  await DetalleFactura.destroy({ where: { id_factura: invoice.id_factura }, transaction });
+
+  const details = [
+    ...summary.rooms.map(item => ({
+      id_factura: invoice.id_factura,
+      descripcion: item.descripcion,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      subtotal: item.subtotal,
+    })),
+    ...summary.services.map(item => ({
+      id_factura: invoice.id_factura,
+      descripcion: item.descripcion,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      subtotal: item.subtotal,
+    })),
+  ];
+
+  if (details.length) await DetalleFactura.bulkCreate(details, { transaction });
+  return invoice;
 }
