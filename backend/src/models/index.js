@@ -15,6 +15,7 @@ import ReservacionServiciosModel from './ReservacionServiciosModel.js';
 import PagosModel from './PagosModel.js';
 import FacturasModel from './FacturasModel.js';
 import DetalleFacturaModel from './DetalleFacturaModel.js';
+import UsuariosModel from './UsuariosModel.js';
 export const models = {
   personas: PersonasModel,
   clientes: ClientesModel,
@@ -33,6 +34,7 @@ export const models = {
   pagos: PagosModel,
   facturas: FacturasModel,
   detalle_factura: DetalleFacturaModel,
+  usuarios: UsuariosModel,
 };
 
 PersonasModel.hasMany(ClientesModel, { foreignKey: 'id_persona', as: 'clientes' });
@@ -72,3 +74,6 @@ FacturasModel.belongsTo(ReservacionesModel, { foreignKey: 'id_reservacion', as: 
 FacturasModel.hasMany(DetalleFacturaModel, { foreignKey: 'id_factura', as: 'detalle_factura' });
 DetalleFacturaModel.belongsTo(FacturasModel, { foreignKey: 'id_factura', as: 'factura' });
 
+
+PersonasModel.hasOne(UsuariosModel, { foreignKey: 'id_persona', as: 'usuario' });
+UsuariosModel.belongsTo(PersonasModel, { foreignKey: 'id_persona', as: 'persona' });

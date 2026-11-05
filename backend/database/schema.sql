@@ -6,6 +6,13 @@ CREATE TABLE IF NOT EXISTS personas (
   identificacion VARCHAR(15), nombre VARCHAR(50), apellidos VARCHAR(60),
   telefono VARCHAR(30), correo VARCHAR(100)
 );
+CREATE TABLE IF NOT EXISTS usuarios (
+  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+  id_persona INT NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_usuarios_personas FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
+);
 CREATE TABLE IF NOT EXISTS clientes (
   id_cliente INT AUTO_INCREMENT PRIMARY KEY,
   id_persona INT NOT NULL UNIQUE,

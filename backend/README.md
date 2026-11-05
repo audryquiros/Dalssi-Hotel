@@ -15,3 +15,8 @@ Las migraciones están en `migrations/`. La primera es una línea base no destru
 
 ## API
 `GET /api/health` y CRUD genérico `GET/POST/PUT/DELETE /api/:tabla`. Tablas admitidas: personas, clientes, paises, huespedes, empleados, tipos_habitacion, habitaciones, reservaciones, detalle_reservacion, detalle_huespedes, categorias_servicios, servicios, reservacion_servicios, pagos, facturas y detalle_factura.
+
+
+## Entidad de autenticación
+
+La tabla `usuarios` se relaciona 1:1 con `personas` mediante `id_persona`. La contraseña se almacena como hash y `fecha_creacion` se genera automáticamente.
