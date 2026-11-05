@@ -1,0 +1,21 @@
+# Checklist de segunda parte
+
+- [x] Entidad usuarios vinculada a personas.
+- [x] CRUD de usuarios: GET listado, GET por id, POST, PUT y DELETE.
+- [x] Registro `/api/auth/register`.
+- [x] Login `/api/auth/login`.
+- [x] Sesión `/api/auth/me`.
+- [x] bcrypt para contraseñas.
+- [x] JWT con expiración y secreto en `.env`.
+- [x] Middleware de autenticación.
+- [x] API protegida salvo endpoints públicos de autenticación y health.
+- [x] Frontend de login y registro.
+- [x] Token enviado automáticamente en las peticiones API.
+- [x] Redirección a login al recibir 401.
+- [x] Logout.
+- [x] Validaciones backend y mensajes claros.
+- [x] `.env.example` actualizado.
+- [x] README.
+- [x] Informe técnico JWT/bcrypt.
+- [x] DER actualizado.
+- [x] Colección Postman/Thunder Client.

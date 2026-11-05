@@ -1,0 +1,62 @@
+{
+  "info": {
+    "name": "Dalssi Hotel API - Segunda Parte",
+    "description": "Colección para validar autenticación JWT, CRUD y respuestas 400/401/404/409.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "token", "value": "" },
+    { "key": "usuarioId", "value": "1" },
+    { "key": "personaId", "value": "1" }
+  ],
+  "item": [
+    { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/health" } },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Persona\",\n  \"apellidos\": \"Prueba\",\n  \"correo\": \"persona.prueba@example.com\",\n  \"password\": \"Dalssi1234\"\n}" },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"correo\": \"persona.prueba@example.com\",\n  \"password\": \"Dalssi1234\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "401 sin token",
+          "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios CRUD",
+      "item": [
+        { "name": "Listar", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/usuarios" } },
+        { "name": "Obtener", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/usuarios/{{usuarioId}}" } },
+        { "name": "Crear", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"id_persona\": {{personaId}},\n  \"password\": \"Dalssi1234\"\n}" }, "url": "{{baseUrl}}/usuarios" } },
+        { "name": "Actualizar contraseña", "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"password\": \"NuevaClave123\"\n}" }, "url": "{{baseUrl}}/usuarios/{{usuarioId}}" } },
+        { "name": "Eliminar", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/usuarios/{{usuarioId}}" } },
+        { "name": "404 usuario", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/usuarios/999999" } }
+      ]
+    }
+  ]
+}

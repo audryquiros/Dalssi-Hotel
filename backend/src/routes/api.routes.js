@@ -7,11 +7,48 @@ import * as dashboardController from '../controllers/dashboard.controller.js';
 import * as facturasController from '../controllers/facturas.controller.js';
 import * as pagosController from '../controllers/pagos.controller.js';
 import * as reservacionesController from '../controllers/reservaciones.controller.js';
+import * as authController from '../controllers/auth.controller.js';
+import * as usuariosController from '../controllers/usuarios.controller.js';
+import { authenticate, authorizeUserType } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
 router.get('/health', (_req, res) => res.json({ status: 'ok', app: 'Dalssi Hotel API' }));
+router.post('/auth/register', authController.register);
+router.post('/auth/login', authController.login);
+router.get('/auth/me', authenticate, authController.me);
+router.post('/auth/logout', authenticate, authController.logout);
+
+router.use(authenticate);
+
+router.get('/cliente/reservaciones', authorizeUserType('cliente'), async (req, res, next) => {
+  try {
+    const { models } = await import('../models/index.js');
+    const data = await models.reservaciones.findAll({
+      where: { id_cliente: req.user.id_cliente },
+      order: [['fecha_entrada', 'DESC']],
+    });
+    res.json({ data });
+  } catch (error) { next(error); }
+});
+
+router.get('/cliente/habitaciones', authorizeUserType('cliente'), async (req, res, next) => {
+  try {
+    const { models } = await import('../models/index.js');
+    const data = await models.habitaciones.findAll({ include: [{ model: models.tipos_habitacion }], order: [['numero', 'ASC']] });
+    res.json({ data });
+  } catch (error) { next(error); }
+});
+
+router.use(authorizeUserType('empleado'));
+
 router.get('/dashboard', dashboardController.summary);
+
+router.get('/usuarios', usuariosController.list);
+router.get('/usuarios/:id', usuariosController.get);
+router.post('/usuarios', usuariosController.create);
+router.put('/usuarios/:id', usuariosController.update);
+router.delete('/usuarios/:id', usuariosController.remove);
 
 router.get('/reservaciones', reservacionesController.list);
 router.get('/reservaciones/:id', reservacionesController.get);

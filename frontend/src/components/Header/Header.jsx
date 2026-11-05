@@ -4,15 +4,15 @@ import { Link } from 'react-router-dom'
 import './Header.css'
 
 const sections = [
-  { label: 'Panel principal', path: '/' },
-  { label: 'Reservaciones', path: '/reservaciones' },
-  { label: 'Habitaciones', path: '/habitaciones' },
-  { label: 'Clientes', path: '/clientes' },
-  { label: 'Huéspedes', path: '/huespedes' },
-  { label: 'Servicios', path: '/servicios' },
-  { label: 'Pagos', path: '/pagos' },
-  { label: 'Facturas', path: '/facturas' },
-  { label: 'Empleados', path: '/empleados' },
+  { label: 'Panel principal', path: '/admin' },
+  { label: 'Reservaciones', path: '/admin/reservaciones' },
+  { label: 'Habitaciones', path: '/admin/habitaciones' },
+  { label: 'Clientes', path: '/admin/clientes' },
+  { label: 'Huéspedes', path: '/admin/huespedes' },
+  { label: 'Servicios', path: '/admin/servicios' },
+  { label: 'Pagos', path: '/admin/pagos' },
+  { label: 'Facturas', path: '/admin/facturas' },
+  { label: 'Empleados', path: '/admin/empleados' },
 ]
 
 const initialNotifications = [

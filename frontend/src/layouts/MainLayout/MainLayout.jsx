@@ -4,15 +4,15 @@ import Header from '../../components/Header/Header.jsx'
 import './MainLayout.css'
 
 const pages = {
-  '/': { title: 'Panel principal', description: 'Resumen general de la operación del hotel.' },
-  '/reservaciones': { title: 'Reservaciones', description: 'Administración de reservaciones.' },
-  '/habitaciones': { title: 'Habitaciones', description: 'Habitaciones, tipos, ubicación y disponibilidad del hotel.' },
-  '/clientes': { title: 'Clientes', description: 'Clientes registrados y sus datos personales.' },
-  '/huespedes': { title: 'Huéspedes', description: 'Huéspedes registrados y sus datos personales.' },
-  '/servicios': { title: 'Servicios', description: 'Servicios disponibles para las reservaciones del hotel.' },
-  '/pagos': { title: 'Pagos', description: 'Registro, seguimiento y control de pagos.' },
-  '/facturas': { title: 'Facturas', description: 'Emisión, impuestos y control de facturación del hotel.' },
-  '/empleados': { title: 'Empleados', description: 'Personal del hotel y sus datos personales.' },
+  '/admin': { title: 'Panel principal', description: 'Resumen general de la operación del hotel.' },
+  '/admin/reservaciones': { title: 'Reservaciones', description: 'Administración de reservaciones.' },
+  '/admin/habitaciones': { title: 'Habitaciones', description: 'Habitaciones, tipos, ubicación y disponibilidad del hotel.' },
+  '/admin/clientes': { title: 'Clientes', description: 'Clientes registrados y sus datos personales.' },
+  '/admin/huespedes': { title: 'Huéspedes', description: 'Huéspedes registrados y sus datos personales.' },
+  '/admin/servicios': { title: 'Servicios', description: 'Servicios disponibles para las reservaciones del hotel.' },
+  '/admin/pagos': { title: 'Pagos', description: 'Registro, seguimiento y control de pagos.' },
+  '/admin/facturas': { title: 'Facturas', description: 'Emisión, impuestos y control de facturación del hotel.' },
+  '/admin/empleados': { title: 'Empleados', description: 'Personal del hotel y sus datos personales.' },
 }
 
 export default function MainLayout() {

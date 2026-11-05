@@ -148,7 +148,7 @@ export default function Reservaciones() {
       { label: 'Observaciones', value: viewing.observaciones || '—' },
     ]} onClose={() => { setViewing(null); setViewingSummary(null); }}>
       <ReservationBreakdown summary={viewingSummary}/>
-      <div className="reservation-detail-actions"><button className="crud-primary" type="button" onClick={() => { setViewing(null); navigate('/pagos', { state: { id_reservacion: viewing.id_reservacion } }); }}><CreditCard size={16}/> Ir a pagos</button></div>
+      <div className="reservation-detail-actions"><button className="crud-primary" type="button" onClick={() => { setViewing(null); navigate('/admin/pagos', { state: { id_reservacion: viewing.id_reservacion } }); }}><CreditCard size={16}/> Ir a pagos</button></div>
     </DetailModal>}
 
     {editing !== null && <div className="crud-modal-backdrop"><form className="crud-modal reservation-edit-modal" onSubmit={save}><div className="crud-modal-head"><h3>{editing === 'new' ? 'Nueva reservación' : 'Editar reservación'}</h3><button type="button" onClick={() => setEditing(null)}><X/></button></div><div className="crud-form-grid">

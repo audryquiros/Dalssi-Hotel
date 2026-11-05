@@ -108,3 +108,10 @@ CREATE TABLE IF NOT EXISTS detalle_factura (
   id_factura INT NOT NULL, descripcion TEXT, cantidad INT, precio_unitario DECIMAL(10,2), subtotal DECIMAL(10,2),
   CONSTRAINT fk_detalle_factura_facturas FOREIGN KEY (id_factura) REFERENCES facturas(id_factura)
 );
+CREATE TABLE IF NOT EXISTS usuarios (
+  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+  id_persona INT NOT NULL UNIQUE,
+  contraseña VARCHAR(255) NOT NULL,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_usuarios_personas FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
+);

@@ -10,13 +10,16 @@
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:status": "sequelize-cli db:migrate:status",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
-    "db:seed": "node database/seed.js"
+    "db:seed": "node database/seed.js",
+    "validate": "node scripts/validate-phase2.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mysql2": "^3.24.6",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
